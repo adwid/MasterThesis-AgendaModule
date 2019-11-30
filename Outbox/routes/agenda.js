@@ -25,9 +25,11 @@ router.post('/create', (req, res) => {
         }
     };
 
-    toInbox(newActivity).finally(() => {
-        res.end();
-    });
+    toInbox(newActivity)
+        .catch(err => console.log("toInbox : err : " + err))
+        .finally(() => {
+            res.end();
+        });
 });
 
 function toInbox(activity) {
