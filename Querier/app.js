@@ -1,20 +1,24 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const agendaRouter = require('./routes/agenda');
 const eventStore = require('./eventStore');
 
 var app = express();
 
 eventStore.connect()
-    .then(() => console.log("Connected to event store !"))
-    .catch(err => console.error("Error with event store connection : %s", err));
+    .catch(err => {
+        console.error("Error with event store connection : %s", err);
+        process.exit(1);
+    })
+    .then(() => {
+        console.log("Connected to event store !");
+        app.use('/agenda', require('./routes/agenda'));
+    });
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/agenda', agendaRouter);
 
 module.exports = app;
