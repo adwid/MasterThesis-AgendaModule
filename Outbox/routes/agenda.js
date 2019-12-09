@@ -3,37 +3,63 @@ const router = express.Router();
 const axios = require('axios').default;
 
 router.post('/create', (req, res) => {
-    const requiredProperties = ["type", "id", "name"];
-    const body = req.body;
-    if (!requiredProperties.every(property => body[property])) {
-        res.status(400).json({"Message": "Here are the required fields : " + requiredProperties});
+    if (!isNote(req.body)) {
+        res.status(400).json({
+            error: "Basic fields required. Please respect the format."
+        });
         return;
     }
 
-    const newActivity = {
-        "@context": "https://www.w3.org/ns/activitystreams",
-        "summary": "Agenda created by " + body.id,
-        "type": "Create",
-        "actor": {
-            "type": "Person",
-            "name": body.id
-        },
-        "object": {
-            "type": "Agenda",
-            "name": body.name,
-            "content": "Lorem ipsum"
-        }
-    };
+    const newActivity = noteToCreateActivity(req.body);
 
-    toInbox(newActivity)
-        .catch(err => console.log("toInbox : err : " + err))
+    forwardToInbox(newActivity)
+        .catch(err => console.error("[err] forwardToInbox : " + err))
         .finally(() => {
             res.end();
         });
 });
 
-function toInbox(activity) {
+function isNote(body) {
+    const noteFields = ['type', 'content', 'attributedTo', 'to', 'mediaType'];
+    const contentFields = ["description", "dates"];
+
+    if (body.type !== "Note"
+        || !noteFields.every(key => body[key])
+        || body.mediaType !== "application/json") return false;
+
+    try {
+        body.content = JSON.parse(body.content);
+    } catch(e) {
+        return false;
+    }
+
+    if (!contentFields.every(key => body.content[key])
+        || !Array.isArray(body.content.dates)
+        || !body.content.dates.every(d => isIsoDate(d))) return false;
+
+    return true;
+}
+
+function noteToCreateActivity(note) {
+    const activity = {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        type: "Create",
+        actor: note.attributedTo,
+        to: note.to,
+        object: note
+    };
+    activity.object.content = JSON.stringify(activity.object.content);
+    return activity;
+}
+
+function forwardToInbox(activity) {
     return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/', activity);
+}
+
+function isIsoDate(str) {
+    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
+    var d = new Date(str);
+    return d.toISOString()===str;
 }
 
 module.exports = router;
