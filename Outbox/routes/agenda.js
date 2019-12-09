@@ -41,15 +41,14 @@ function isNote(body) {
 }
 
 function noteToCreateActivity(note) {
-    const activity = {
+    note.content = JSON.stringify(note.content);
+    return {
         "@context": "https://www.w3.org/ns/activitystreams",
         type: "Create",
         actor: note.attributedTo,
         to: note.to,
         object: note
     };
-    activity.object.content = JSON.stringify(activity.object.content);
-    return activity;
 }
 
 function forwardToInbox(activity) {
