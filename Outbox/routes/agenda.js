@@ -15,8 +15,13 @@ router.post('/create', (req, res) => {
     const newActivity = req.body;
     newActivity.id = uuid();
 
-    forwardToInbox(res, newActivity)
+    forwardToInbox(res, newActivity, '/')
         .then(() => res.json({id: newActivity.id}))
+});
+
+router.post("/vote", (req, res) => {
+    forwardToInbox(res, req.body, '/vote')
+        .then(() => res.end());
 });
 
 function isNote(body) {
@@ -51,8 +56,8 @@ function noteToCreateActivity(note) {
     };
 }
 
-function forwardToInbox(res, activity) {
-    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/post', activity)
+function forwardToInbox(res, activity, path) {
+    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
         .catch(err => {
             res.status(500).json({
                 error: "Internal error. Please try later or contact admins."
