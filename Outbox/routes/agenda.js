@@ -15,14 +15,8 @@ router.post('/create', (req, res) => {
     const newActivity = req.body;
     newActivity.id = uuid();
 
-    forwardToInbox(newActivity)
+    forwardToInbox(res, newActivity)
         .then(() => res.json({id: newActivity.id}))
-        .catch(err => {
-            res.status(500).json({
-                error: "Internal error. Please try later or contact admins."
-            });
-            console.error("[err] forwardToInbox : " + err)
-        });
 });
 
 function isNote(body) {
@@ -57,8 +51,14 @@ function noteToCreateActivity(note) {
     };
 }
 
-function forwardToInbox(activity) {
-    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/post', activity);
+function forwardToInbox(res, activity) {
+    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/post', activity)
+        .catch(err => {
+            res.status(500).json({
+                error: "Internal error. Please try later or contact admins."
+            });
+            console.error("[err] forwardToInbox : " + err)
+        });
 }
 
 function isIsoDate(str) {
