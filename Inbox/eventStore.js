@@ -1,13 +1,48 @@
-const wolkenkit = require('wolkenkit-client');
+const eventStoreClient = require('event-store-client');
 
-var _eventStore;
+var es = undefined;
 
-async function connect() {
-    _eventStore = await wolkenkit.connect({ host: 'local.wolkenkit.io', port: 4000 });
+var config = {
+    'eventStore': {
+        'address': "127.0.0.1",
+        'port': 1113,
+        'stream': '$stats-127.0.0.1:2113',
+        'credentials': {
+            'username': "admin",
+            'password': "changeit"
+        }
+    },
+    'debug': false
+};
+
+var options = {
+    host: config.eventStore.address,
+    port: config.eventStore.port,
+    debug: config.debug
+};
+
+function getES() {
+    if (es === undefined) es = new eventStoreClient.Connection(options);
+    return es;
 }
 
-function get() {
-    return _eventStore;
+function close() {
+    if (es !== undefined) {
+        es.close();
+        es = undefined;
+    }
 }
 
-module.exports = {connect, get};
+function getCredentials() {
+    return config.eventStore.credentials;
+}
+
+function getNewID() {
+    return eventStoreClient.Connection.createGuid();
+}
+
+function getExpectedVersion() {
+    return eventStoreClient.ExpectedVersion.Any;
+}
+
+module.exports = { getES, getCredentials, getNewID, getExpectedVersion, close };
