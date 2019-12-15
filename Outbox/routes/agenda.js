@@ -1,21 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
+const uuid = require('uuid/v4');
 
 router.post('/create', (req, res) => {
-    if (!isNote(req.body)) {
-        res.status(400).json({
-            error: "Basic fields required. Please respect the format."
-        });
-        return;
-    }
+    // if (!isNote(req.body)) {
+    //     res.status(400).json({
+    //         error: "Basic fields required. Please respect the format."
+    //     });
+    //     return;
+    // }
 
-    const newActivity = noteToCreateActivity(req.body);
+    // const newActivity = noteToCreateActivity(req.body);
+    const newActivity = req.body;
+    newActivity.id = uuid();
 
     forwardToInbox(newActivity)
-        .catch(err => console.error("[err] forwardToInbox : " + err))
-        .finally(() => {
-            res.end();
+        .then(() => res.json({id: newActivity.id}))
+        .catch(err => {
+            res.status(500).json({
+                error: "Internal error. Please try later or contact admins."
+            });
+            console.error("[err] forwardToInbox : " + err)
         });
 });
 
