@@ -11,8 +11,11 @@ function postNewAgenda(agenda) {
         eventType: 'newAgenda',
         data: agenda
     };
-    console.log(event)
-    eventStore.writeEvents(streamID, eventStoreManager.getExpectedVersion(), false, [event], esCredentials, completed => {
+    write("agenda", [event]);
+}
+
+function write(streamID, eventsArray) {
+    eventStore.writeEvents(streamID, eventStoreManager.getExpectedVersion(), false, eventsArray, esCredentials, completed => {
         console.log("Event written result: " + eventStoreClient.OperationResult.getName(completed.result));
     });
 }
