@@ -23,6 +23,49 @@ function createNewAgenda(agenda) {
     });
 }
 
+function applyVote(vote) {
+    const agendaID = vote.agendaID;
+    const userID = vote.from;
+    return cleanVotes(agendaID, userID)
+        .then(() => {
+            return new Promise((resolve, reject) => {
+                AgendaModel.findByIdAndUpdate(agendaID, {
+                        $push: {
+                            "dates.$[element].forIt" : userID,
+                            "answeredBy": userID
+                        }
+                    },
+                    {
+                        arrayFilters : [ { "element.date": { $in : vote.dates } } ]
+                    },
+                    (err, result) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        resolve();
+                    });
+            });
+        });
+}
+
+function cleanVotes(agendaID, userID) {
+    return new Promise((resolve, reject) => {
+        AgendaModel.findByIdAndUpdate(agendaID, {
+            $pull: {
+                "dates.$[].forIt": userID,
+                "answeredBy": userID
+            }
+        }, (err, result) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve();
+        });
+    });
+}
+
 function getAgenda(id) {
     return new Promise(((resolve, reject) => {
         AgendaModel.findById(id, (err, agenda) => {
@@ -35,4 +78,4 @@ function getAgenda(id) {
     }));
 }
 
-module.exports = {createNewAgenda, getAgenda};
+module.exports = {createNewAgenda, applyVote, getAgenda};

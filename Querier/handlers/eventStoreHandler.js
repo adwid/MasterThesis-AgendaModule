@@ -5,8 +5,9 @@ const db = require('./dbHandler');
 
 const streamId = "agenda";
 const eventCallback = new Map();
-eventCallback.set('newAgenda', writeNewAgenda);
 
+eventCallback.set('newAgenda', writeNewAgenda);
+eventCallback.set('vote', applyVote);
 
 console.log('Subscribing to ' + streamId + "...");
 eventStore.subscribeToStream(streamId, true, function(streamEvent) {
@@ -21,6 +22,12 @@ eventStore.subscribeToStream(streamId, true, function(streamEvent) {
 function writeNewAgenda(newAgenda) {
     db.createNewAgenda(newAgenda)
         .then(res => console.log("New agenda stored !"))
+        .catch(err => console.error("[ERR] database : " + err));
+}
+
+function applyVote(vote) {
+    db.applyVote(vote)
+        .then(res => console.log("New vote applied !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
 
