@@ -6,12 +6,10 @@ function createNewAgenda(agenda) {
         _id: agenda.id,
         name: agenda.name,
         description: agenda.description,
-        dates: {}
+        dates: []
     };
     for (const d of agenda.dates) {
-        // Parse dates in ISO format to numeric value (since 1970)
-        let numericValue = (new Date(d)).getTime();
-        agendaContent.dates[numericValue] = [];
+        agendaContent.dates.push({date: d, forIt: []})
     }
     const newAgenda = new AgendaModel(agendaContent);
     return new Promise((resolve, reject) => {
@@ -31,13 +29,6 @@ function getAgenda(id) {
             if (err) {
                 reject(err);
                 return;
-            }
-            // Translate date as numeric value to ISO string
-            const dates = agenda.dates;
-            agenda.dates = {};
-            for (let date in dates) {
-                let iso = (new Date(+date)).toISOString();
-                agenda.dates[iso] = dates[date];
             }
             resolve(agenda);
         });
