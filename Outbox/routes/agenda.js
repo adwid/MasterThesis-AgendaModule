@@ -52,7 +52,7 @@ function noteToCreateActivity(note) {
 }
 
 function forwardToInbox(activity) {
-    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/', activity);
+    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda/post', activity);
 }
 
 function isIsoDate(str) {
