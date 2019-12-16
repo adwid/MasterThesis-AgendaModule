@@ -93,4 +93,16 @@ function getAgenda(id) {
     }));
 }
 
-module.exports = {applyVote, createNewAgenda, getAgenda, withdrawVote,};
+function getAgendaOf(userID) {
+    return new Promise((resolve, reject) => {
+        AgendaModel.find({"participants.id": {$eq: userID}}, (err, agendas) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(agendas);
+        });
+    });
+}
+
+module.exports = {applyVote, createNewAgenda, getAgenda, getAgendaOf, withdrawVote,};

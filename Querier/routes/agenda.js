@@ -17,4 +17,19 @@ router.get("/:id", (req, res) => {
         })
 });
 
+router.get("/user/:id", (req, res) => {
+    db.getAgendaOf(req.params.id)
+        .then(agendas => {
+            if (agendas.length === 0) {
+                res.status(404).end();
+                return;
+            }
+            res.json(agendas);
+        })
+        .catch(err => {
+            console.error("[ERR] GET AGENDA OF : " + err);
+            res.status(500).json({error: "Internal error. Please try later or contact admins"});
+        });
+});
+
 module.exports = router;
