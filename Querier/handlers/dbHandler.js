@@ -23,7 +23,6 @@ function createNewAgenda(agenda) {
 function applyVote(vote) {
     return withdrawVote(vote)
         .then(() => {
-            // todo check if update return something ?
             return AgendaModel.findByIdAndUpdate(vote.agendaID, {
                 $push: {
                     "dates.$[element].forIt" : vote.from,

@@ -28,7 +28,7 @@ function writeNewAgenda(newAgenda) {
 
 function applyVote(vote) {
     db.applyVote(vote)
-        .then(res => console.log("New vote applied !"))
+        .then(res => console.log("New vote computed !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
 
