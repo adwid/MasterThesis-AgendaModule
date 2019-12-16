@@ -17,41 +17,25 @@ function createNewAgenda(agenda) {
         agendaContent.dates.push({date: d, forIt: []});
     }
     const newAgenda = new AgendaModel(agendaContent);
-    return new Promise((resolve, reject) => {
-        newAgenda.save({checkKeys: false}, (err, response) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(response);
-        })
-    });
+    return newAgenda.save();
 }
 
 function applyVote(vote) {
     return withdrawVote(vote)
         .then(() => {
-            return new Promise((resolve, reject) => {
-                AgendaModel.findByIdAndUpdate(vote.agendaID, {
-                        $push: {
-                            "dates.$[element].forIt" : vote.from,
-                        },
-                        $set: {
-                            "participants.$[participant].hasParticipated": true
-                        }
-                    }, {
-                        arrayFilters : [
-                            { "element.date": { $in : vote.dates } },
-                            { "participant.id": { $eq : vote.from } }
-                        ]
-                    },
-                    (err, result) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        resolve();
-                    });
+            // todo check if update return something ?
+            return AgendaModel.findByIdAndUpdate(vote.agendaID, {
+                $push: {
+                    "dates.$[element].forIt" : vote.from,
+                },
+                $set: {
+                    "participants.$[participant].hasParticipated": true
+                }
+            }, {
+                arrayFilters : [
+                    { "element.date": { $in : vote.dates } },
+                    { "participant.id": { $eq : vote.from } }
+                ]
             });
         });
 }
@@ -59,52 +43,33 @@ function applyVote(vote) {
 function withdrawVote(withdrawing) {
     const agendaID = withdrawing.agendaID;
     const userID = withdrawing.from;
-    return new Promise((resolve, reject) => {
-        AgendaModel.findByIdAndUpdate(agendaID, {
-            $pull: {
-                "dates.$[].forIt": userID,
-            },
-            $set: {
-                "participants.$[participant].hasParticipated": false
-            }
-        }, {
-            arrayFilters : [
-                { "participant.id": { $eq : userID } }
-            ]
-        }, (err, result) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            // todo check if result != undefined => check if it has been updated
-            resolve();
-        });
+    return AgendaModel.findByIdAndUpdate(agendaID, {
+        $pull: {
+            "dates.$[].forIt": userID,
+        },
+        $set: {
+            "participants.$[participant].hasParticipated": false
+        }
+    }, {
+        arrayFilters : [
+            { "participant.id": { $eq : userID } }
+        ]
     });
 }
 
 function getAgenda(id) {
-    return new Promise(((resolve, reject) => {
-        AgendaModel.findById(id, (err, agenda) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            resolve(documentToJSON(agenda));
+    return AgendaModel.findById(id)
+        .then(agenda => {
+            return Promise.resolve(documentToJSON(agenda));
         });
-    }));
 }
 
 function getAgendaOf(userID) {
-    return new Promise((resolve, reject) => {
-        AgendaModel.find({"participants.id": {$eq: userID}}, (err, agendas) => {
-            if (err) {
-                reject(err);
-                return;
-            }
+    return AgendaModel.find({"participants.id": {$eq: userID}})
+        .then(agendas => {
             for (const index in agendas) agendas[index] = documentToJSON(agendas[index]);
-            resolve(agendas);
+            return Promise.resolve(agendas);
         });
-    });
 }
 
 function documentToJSON(agenda) {
