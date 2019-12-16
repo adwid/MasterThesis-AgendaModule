@@ -28,4 +28,6 @@ const AgendaSchema = new mongoose.Schema({
     }
 });
 
+AgendaSchema.index({"participants.id": 1});
+
 module.exports = mongoose.model('Agenda', AgendaSchema);
