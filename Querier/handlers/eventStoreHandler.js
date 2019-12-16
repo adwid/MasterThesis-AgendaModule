@@ -8,6 +8,7 @@ const eventCallback = new Map();
 
 eventCallback.set('newAgenda', writeNewAgenda);
 eventCallback.set('vote', applyVote);
+eventCallback.set('withdraw', withdrawVote);
 
 console.log('Subscribing to ' + streamId + "...");
 eventStore.subscribeToStream(streamId, true, function(streamEvent) {
@@ -28,6 +29,12 @@ function writeNewAgenda(newAgenda) {
 function applyVote(vote) {
     db.applyVote(vote)
         .then(res => console.log("New vote applied !"))
+        .catch(err => console.error("[ERR] database : " + err));
+}
+
+function withdrawVote(withdrawing) {
+    db.withdrawVote(withdrawing)
+        .then(res => console.log("Vote withdrew !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
 

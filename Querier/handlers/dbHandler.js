@@ -29,14 +29,12 @@ function createNewAgenda(agenda) {
 }
 
 function applyVote(vote) {
-    const agendaID = vote.agendaID;
-    const userID = vote.from;
-    return cleanVotes(agendaID, userID)
+    return withdrawVote(vote)
         .then(() => {
             return new Promise((resolve, reject) => {
-                AgendaModel.findByIdAndUpdate(agendaID, {
+                AgendaModel.findByIdAndUpdate(vote.agendaID, {
                         $push: {
-                            "dates.$[element].forIt" : userID,
+                            "dates.$[element].forIt" : vote.from,
                         },
                         $set: {
                             "participants.$[participant].hasParticipated": true
@@ -44,7 +42,7 @@ function applyVote(vote) {
                     }, {
                         arrayFilters : [
                             { "element.date": { $in : vote.dates } },
-                            { "participant.id": { $eq : userID } }
+                            { "participant.id": { $eq : vote.from } }
                         ]
                     },
                     (err, result) => {
@@ -58,7 +56,9 @@ function applyVote(vote) {
         });
 }
 
-function cleanVotes(agendaID, userID) {
+function withdrawVote(withdrawing) {
+    const agendaID = withdrawing.agendaID;
+    const userID = withdrawing.from;
     return new Promise((resolve, reject) => {
         AgendaModel.findByIdAndUpdate(agendaID, {
             $pull: {
@@ -93,4 +93,4 @@ function getAgenda(id) {
     }));
 }
 
-module.exports = {createNewAgenda, applyVote, getAgenda};
+module.exports = {applyVote, createNewAgenda, getAgenda, withdrawVote,};

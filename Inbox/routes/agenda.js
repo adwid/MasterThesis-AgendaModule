@@ -12,4 +12,9 @@ router.post("/vote", (req, res) => {
     res.end();
 });
 
+router.post("/withdraw", (req, res) => {
+    esHandler.postEvent(req.body, "withdraw");
+    res.end();
+});
+
 module.exports = router;
