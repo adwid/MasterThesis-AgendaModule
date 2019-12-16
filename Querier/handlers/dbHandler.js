@@ -6,10 +6,15 @@ function createNewAgenda(agenda) {
         _id: agenda.id,
         name: agenda.name,
         description: agenda.description,
-        dates: []
+        dates: [],
+        participants: []
     };
+    agendaContent.participants.push({id: agenda.from});
+    for (const t of agenda.to) {
+        agendaContent.participants.push({id: t});
+    }
     for (const d of agenda.dates) {
-        agendaContent.dates.push({date: d, forIt: []})
+        agendaContent.dates.push({date: d, forIt: []});
     }
     const newAgenda = new AgendaModel(agendaContent);
     return new Promise((resolve, reject) => {
@@ -32,11 +37,15 @@ function applyVote(vote) {
                 AgendaModel.findByIdAndUpdate(agendaID, {
                         $push: {
                             "dates.$[element].forIt" : userID,
-                            "answeredBy": userID
+                        },
+                        $set: {
+                            "participants.$[participant].hasParticipated": true
                         }
-                    },
-                    {
-                        arrayFilters : [ { "element.date": { $in : vote.dates } } ]
+                    }, {
+                        arrayFilters : [
+                            { "element.date": { $in : vote.dates } },
+                            { "participant.id": { $eq : userID } }
+                        ]
                     },
                     (err, result) => {
                         if (err) {
@@ -54,8 +63,14 @@ function cleanVotes(agendaID, userID) {
         AgendaModel.findByIdAndUpdate(agendaID, {
             $pull: {
                 "dates.$[].forIt": userID,
-                "answeredBy": userID
+            },
+            $set: {
+                "participants.$[participant].hasParticipated": false
             }
+        }, {
+            arrayFilters : [
+                { "participant.id": { $eq : userID } }
+            ]
         }, (err, result) => {
             if (err) {
                 reject(err);
