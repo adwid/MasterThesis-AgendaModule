@@ -11,6 +11,10 @@ function postEvent(content, type) {
         eventType: type,
         data: content
     };
+    if (type === "newAgenda") {
+        event.data.agendaID = content.id;
+        delete event.data.id;
+    }
     write("agenda", [event]);
 }
 

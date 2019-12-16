@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 function createNewAgenda(agenda) {
     const agendaContent = {
-        _id: agenda.id,
+        _id: agenda.agendaID,
         name: agenda.name,
         description: agenda.description,
         dates: [],
@@ -76,6 +76,7 @@ function withdrawVote(withdrawing) {
                 reject(err);
                 return;
             }
+            // todo check if result != undefined => check if it has been updated
             resolve();
         });
     });
@@ -88,7 +89,7 @@ function getAgenda(id) {
                 reject(err);
                 return;
             }
-            resolve(agenda);
+            resolve(documentToJSON(agenda));
         });
     }));
 }
@@ -100,9 +101,19 @@ function getAgendaOf(userID) {
                 reject(err);
                 return;
             }
+            for (const index in agendas) agendas[index] = documentToJSON(agendas[index]);
             resolve(agendas);
         });
     });
+}
+
+function documentToJSON(agenda) {
+    if (!agenda) return {};
+    var json = agenda.toJSON();
+    delete json._id;
+    delete json.__v;
+    json.adendaID = agenda.id;
+    return json;
 }
 
 module.exports = {applyVote, createNewAgenda, getAgenda, getAgendaOf, withdrawVote,};
