@@ -21,7 +21,7 @@ var options = {
     debug: config.debug
 };
 
-function getES() {
+function getES() { // todo check connection thanks to ping
     if (es === undefined) es = new eventStoreClient.Connection(options);
     return es;
 }
