@@ -46,11 +46,14 @@ function closeAgenda(closeCommand) {
     const agendaID = closeCommand.agendaID;
     const selectedDate = closeCommand.date;
     const userID = closeCommand.from;
-    return AgendaModel.findOneAndUpdate({
+    const findRequest = {
         _id: {$eq: agendaID},
-        dates: {$elemMatch: {date: {$eq: selectedDate}}},
         "participants.0.id": userID
-    }, {
+    };
+    if (selectedDate !== "") {
+        findRequest.dates = {$elemMatch: {date: {$eq: selectedDate}}};
+    }
+    return AgendaModel.findOneAndUpdate(findRequest, {
         $set: {selectedDate: selectedDate}
     });
 }
