@@ -15,15 +15,17 @@ function postEvent(content, type) {
         event.data.agendaID = content.id;
         delete event.data.id;
     }
-    write("agenda", [event]);
+    return write("agenda", [event]);
 }
 
 function write(streamID, eventsArray) {
-    // todo promise, catch etc for the http request response
-    eventStore.writeEvents(streamID, eventStoreManager.getExpectedVersion(), false, eventsArray, esCredentials, completed => {
-        console.log("Event written result: " + eventStoreClient.OperationResult.getName(completed.result));
-    });
-}
+    return new Promise((resolve, reject) => {
+        eventStore.writeEvents(streamID, eventStoreManager.getExpectedVersion(), false, eventsArray, esCredentials, completed => {
+            console.log("Event written result: " + eventStoreClient.OperationResult.getName(completed.result));
+            if (completed.result === eventStoreClient.OperationResult.Success) resolve();
+            else reject();
+        });
+    });}
 
 module.exports = {postEvent};
 
