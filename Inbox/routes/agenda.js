@@ -18,6 +18,10 @@ router.post("/close", (req, res) => {
     postEvent(req.body, "close", res);
 });
 
+router.post("/open", (req, res) => {
+    postEvent(req.body, "open", res);
+});
+
 function postEvent(event, type, res) {
     esHandler.postEvent(event, type)
         .then(() => {

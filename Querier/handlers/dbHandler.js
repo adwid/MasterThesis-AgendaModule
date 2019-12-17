@@ -55,6 +55,17 @@ function closeAgenda(closeCommand) {
     });
 }
 
+function openAgenda(openCommand) {
+    const agendaID = openCommand.agendaID;
+    const userID = openCommand.from;
+    return AgendaModel.findOneAndUpdate({
+        _id: {$eq: agendaID},
+        "participants.0.id": userID
+    }, {
+        $unset: {selectedDate: ""}
+    });
+}
+
 function withdrawVote(withdrawing) {
     const agendaID = withdrawing.agendaID;
     const userID = withdrawing.from;
@@ -99,4 +110,4 @@ function documentToJSON(agenda) {
     return json;
 }
 
-module.exports = {applyVote, closeAgenda, createNewAgenda, getAgenda, getAgendaOf, withdrawVote,};
+module.exports = {applyVote, closeAgenda, createNewAgenda, getAgenda, getAgendaOf, openAgenda, withdrawVote,};

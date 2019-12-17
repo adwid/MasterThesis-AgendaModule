@@ -30,6 +30,10 @@ router.post('/close', (req, res) => {
     forwardToInbox(res, req.body, "/close", () => res.end());
 });
 
+router.post('/open', (req, res) => {
+    forwardToInbox(res, req.body, "/open", () => res.end());
+});
+
 function isNote(body) {
     const noteFields = ['type', 'content', 'attributedTo', 'to', 'mediaType'];
     const contentFields = ["description", "dates"];

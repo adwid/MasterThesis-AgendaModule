@@ -10,6 +10,7 @@ eventCallback.set('newAgenda', writeNewAgenda);
 eventCallback.set('vote', applyVote);
 eventCallback.set('withdraw', withdrawVote);
 eventCallback.set('close', closeAgenda);
+eventCallback.set('open', openAgenda);
 
 console.log('Subscribing to ' + streamId + "...");
 eventStore.subscribeToStream(streamId, true, function(streamEvent) {
@@ -42,6 +43,12 @@ function withdrawVote(withdrawing) {
 function closeAgenda(closeCommand) {
     db.closeAgenda((closeCommand))
         .then(res => console.log("Agenda closed !"))
+        .catch(err => console.error("[ERR] database : " + err));
+}
+
+function openAgenda(openCommand) {
+    db.openAgenda(openCommand)
+        .then(res => console.log("Agenda opened !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
 
