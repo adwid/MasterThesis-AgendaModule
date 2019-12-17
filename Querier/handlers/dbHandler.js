@@ -23,7 +23,10 @@ function createNewAgenda(agenda) {
 function applyVote(vote) {
     return withdrawVote(vote)
         .then(() => {
-            return AgendaModel.findByIdAndUpdate(vote.agendaID, {
+            return AgendaModel.findOneAndUpdate({
+                _id: {$eq: vote.agendaID},
+                selectedDate: {$exists: false}
+            }, {
                 $push: {
                     "dates.$[element].forIt" : vote.from,
                 },
@@ -39,10 +42,26 @@ function applyVote(vote) {
         });
 }
 
+function closeAgenda(closeCommand) {
+    const agendaID = closeCommand.agendaID;
+    const selectedDate = closeCommand.date;
+    const userID = closeCommand.from;
+    return AgendaModel.findOneAndUpdate({
+        _id: {$eq: agendaID},
+        dates: {$elemMatch: {date: {$eq: selectedDate}}},
+        "participants.0.id": userID
+    }, {
+        $set: {selectedDate: selectedDate}
+    });
+}
+
 function withdrawVote(withdrawing) {
     const agendaID = withdrawing.agendaID;
     const userID = withdrawing.from;
-    return AgendaModel.findByIdAndUpdate(agendaID, {
+    return AgendaModel.findOneAndUpdate({
+        _id: {$eq: agendaID},
+        selectedDate: {$exists: false}
+    }, {
         $pull: {
             "dates.$[].forIt": userID,
         },
@@ -80,4 +99,4 @@ function documentToJSON(agenda) {
     return json;
 }
 
-module.exports = {applyVote, createNewAgenda, getAgenda, getAgendaOf, withdrawVote,};
+module.exports = {applyVote, closeAgenda, createNewAgenda, getAgenda, getAgendaOf, withdrawVote,};

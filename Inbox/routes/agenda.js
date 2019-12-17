@@ -14,6 +14,10 @@ router.post("/withdraw", (req, res) => {
     postEvent(req.body, "withdraw", res);
 });
 
+router.post("/close", (req, res) => {
+    postEvent(req.body, "close", res);
+});
+
 function postEvent(event, type, res) {
     esHandler.postEvent(event, type)
         .then(() => {

@@ -26,6 +26,10 @@ router.post('/withdraw', (req, res) => {
     forwardToInbox(res, req.body, '/withdraw', () => res.end())
 });
 
+router.post('/close', (req, res) => {
+    forwardToInbox(res, req.body, "/close", () => res.end());
+});
+
 function isNote(body) {
     const noteFields = ['type', 'content', 'attributedTo', 'to', 'mediaType'];
     const contentFields = ["description", "dates"];
