@@ -18,10 +18,19 @@ var config = {
 var options = {
     host: config.eventStore.address,
     port: config.eventStore.port,
-    debug: config.debug
+    debug: config.debug,
+    onConnect: () => console.log("Connected to EventStore !"),
+    onError: (err) => {
+        console.error("EventStore connection impossible (" + err + ")");
+        process.exit(1);
+    },
+    onClose: () => {
+        console.error("Connection with EventStore lost.");
+        process.exit(1);
+    }
 };
 
-function getES() { // todo check connection thanks to ping
+function getES() {
     if (es === undefined) es = new eventStoreClient.Connection(options);
     return es;
 }
