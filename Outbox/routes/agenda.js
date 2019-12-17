@@ -15,18 +15,15 @@ router.post('/create', (req, res) => {
     const newActivity = req.body;
     newActivity.id = uuid();
 
-    forwardToInbox(res, newActivity, '/')
-        .then(() => res.json({id: newActivity.id}))
+    forwardToInbox(res, newActivity, '/', () => res.json({id: newActivity.id}))
 });
 
 router.post("/vote", (req, res) => {
-    forwardToInbox(res, req.body, '/vote')
-        .then(() => res.end());
+    forwardToInbox(res, req.body, '/vote', () => res.end());
 });
 
 router.post('/withdraw', (req, res) => {
-    forwardToInbox(res, req.body, '/withdraw')
-        .then(() => res.end());
+    forwardToInbox(res, req.body, '/withdraw', () => res.end())
 });
 
 function isNote(body) {
@@ -61,11 +58,12 @@ function noteToCreateActivity(note) {
     };
 }
 
-function forwardToInbox(res, activity, path) {
+function forwardToInbox(res, activity, path, callback) {
     return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
+        .then(callback)
         .catch(err => {
-            res.status(500).json({
-                error: "Internal error. Please try later or contact admins."
+            res.status(502).json({
+                error: "Error with the recipient's inbox."
             });
             console.error("[err] forwardToInbox : " + err)
         });
