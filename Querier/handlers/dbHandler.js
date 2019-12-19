@@ -1,22 +1,22 @@
 const AgendaModel = require('../models/agenda');
-const mongoose = require('mongoose');
 
-function createNewAgenda(agenda) {
-    const agendaContent = {
-        _id: agenda.agendaID,
+function createNewAgenda(noteObject) {
+    const agenda = noteObject.content;
+    const newAgendaContent = {
+        _id: noteObject.id,
         name: agenda.name,
         description: agenda.description,
         dates: [],
         participants: []
     };
-    agendaContent.participants.push({id: agenda.from});
-    for (const t of agenda.to) {
-        agendaContent.participants.push({id: t});
+    newAgendaContent.participants.push({id: noteObject.attributedTo});
+    for (const t of noteObject.to) {
+        newAgendaContent.participants.push({id: t});
     }
     for (const d of agenda.dates) {
-        agendaContent.dates.push({date: d, forIt: []});
+        newAgendaContent.dates.push({date: d, forIt: []});
     }
-    const newAgenda = new AgendaModel(agendaContent);
+    const newAgenda = new AgendaModel(newAgendaContent);
     return newAgenda.save();
 }
 

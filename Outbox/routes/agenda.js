@@ -2,20 +2,16 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
 const uuid = require('uuid/v4');
+const requestHandler = require('../hanlders/requestHandler');
 
 router.post('/create', (req, res) => {
-    // if (!isNote(req.body)) {
-    //     res.status(400).json({
-    //         error: "Basic fields required. Please respect the format."
-    //     });
-    //     return;
-    // }
+    const activity = requestHandler.generateCreateAgendaActivity(req.body);
+    if (!activity) {
+        res.status(400).end();
+        return;
+    }
 
-    // const newActivity = noteToCreateActivity(req.body);
-    const newActivity = req.body;
-    newActivity.id = uuid();
-
-    forwardToInbox(res, newActivity, '/', () => res.json({id: newActivity.id}))
+    forwardToInbox(res, activity, '/', () => res.status(201).json(activity))
 });
 
 router.post("/vote", (req, res) => {
@@ -67,6 +63,7 @@ function noteToCreateActivity(note) {
 }
 
 function forwardToInbox(res, activity, path, callback) {
+    // todo
     return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
         .then(callback)
         .catch(err => {
@@ -75,12 +72,6 @@ function forwardToInbox(res, activity, path, callback) {
             });
             console.error("[err] forwardToInbox : " + err)
         });
-}
-
-function isIsoDate(str) {
-    if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
-    var d = new Date(str);
-    return d.toISOString()===str;
 }
 
 module.exports = router;

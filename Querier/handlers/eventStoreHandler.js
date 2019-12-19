@@ -19,11 +19,11 @@ eventStore.subscribeToStream(streamId, true, function(streamEvent) {
         return;
     }
     var callback = eventCallback.get(streamEvent.eventType);
-    callback(streamEvent.data);
+    callback(streamEvent.data.object); // Pass the note object of the activity
 }, onSubscriptionConfirmed, undefined, credentials, undefined);
 
-function writeNewAgenda(newAgenda) {
-    db.createNewAgenda(newAgenda)
+function writeNewAgenda(noteObject) {
+    db.createNewAgenda(noteObject)
         .then(res => console.log("New agenda stored !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
