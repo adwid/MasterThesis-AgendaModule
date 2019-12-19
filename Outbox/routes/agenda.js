@@ -15,7 +15,13 @@ router.post('/create', (req, res) => {
 });
 
 router.post("/vote", (req, res) => {
-    forwardToInbox(res, req.body, '/vote', () => res.end());
+    const activity = requestHandler.generateCreateVoteActivity(req.body);
+    if (!activity) {
+        res.status(400).end();
+        return;
+    }
+
+    forwardToInbox(res, activity, '/vote', () => res.status(201).json(activity))
 });
 
 router.post('/withdraw', (req, res) => {
@@ -29,38 +35,6 @@ router.post('/close', (req, res) => {
 router.post('/open', (req, res) => {
     forwardToInbox(res, req.body, "/open", () => res.end());
 });
-
-function isNote(body) {
-    const noteFields = ['type', 'content', 'attributedTo', 'to', 'mediaType'];
-    const contentFields = ["description", "dates"];
-
-    if (body.type !== "Note"
-        || !noteFields.every(key => body[key])
-        || body.mediaType !== "application/json") return false;
-
-    try {
-        body.content = JSON.parse(body.content);
-    } catch(e) {
-        return false;
-    }
-
-    if (!contentFields.every(key => body.content[key])
-        || !Array.isArray(body.content.dates)
-        || !body.content.dates.every(d => isIsoDate(d))) return false;
-
-    return true;
-}
-
-function noteToCreateActivity(note) {
-    note.content = JSON.stringify(note.content);
-    return {
-        "@context": "https://www.w3.org/ns/activitystreams",
-        type: "Create",
-        actor: note.attributedTo,
-        to: note.to,
-        object: note
-    };
-}
 
 function forwardToInbox(res, activity, path, callback) {
     // todo

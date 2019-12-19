@@ -28,8 +28,8 @@ function writeNewAgenda(noteObject) {
         .catch(err => console.error("[ERR] database : " + err));
 }
 
-function applyVote(vote) {
-    db.applyVote(vote)
+function applyVote(noteObject) {
+    db.applyVote(noteObject)
         .then(res => console.log("New vote computed !"))
         .catch(err => console.error("[ERR] database : " + err));
 }

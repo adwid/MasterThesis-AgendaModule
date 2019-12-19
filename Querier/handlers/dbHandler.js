@@ -20,23 +20,26 @@ function createNewAgenda(noteObject) {
     return newAgenda.save();
 }
 
-function applyVote(vote) {
-    return withdrawVote(vote)
+function applyVote(noteobject) {
+    const agendaID = noteobject.inReplyTo;
+    const userID = noteobject.attributedTo;
+    const dates = noteobject.content.dates;
+    return withdrawVote(noteobject)
         .then(() => {
             return AgendaModel.findOneAndUpdate({
-                _id: {$eq: vote.agendaID},
+                _id: {$eq: agendaID},
                 selectedDate: {$exists: false}
             }, {
                 $push: {
-                    "dates.$[element].forIt" : vote.from,
+                    "dates.$[element].forIt": userID,
                 },
                 $set: {
                     "participants.$[participant].hasParticipated": true
                 }
             }, {
-                arrayFilters : [
-                    { "element.date": { $in : vote.dates } },
-                    { "participant.id": { $eq : vote.from } }
+                arrayFilters: [
+                    {"element.date": {$in: dates}},
+                    {"participant.id": {$eq: userID}}
                 ]
             });
         });
@@ -69,9 +72,9 @@ function openAgenda(openCommand) {
     });
 }
 
-function withdrawVote(withdrawing) {
-    const agendaID = withdrawing.agendaID;
-    const userID = withdrawing.from;
+function withdrawVote(noteObject) {
+    const agendaID = noteObject.inReplyTo;
+    const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
         selectedDate: {$exists: false}
