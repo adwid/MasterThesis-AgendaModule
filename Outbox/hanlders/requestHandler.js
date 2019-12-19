@@ -14,7 +14,7 @@ function generateCreateAgendaActivity(request) {
     }
     if (!activity) return undefined;
     activity.published = (new Date()).toISOString();
-    activity.object.id = uuid(); //todo
+    activity.object.id = "http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/" + uuid(); //todo
     activity.id = uuid(); //todo
     return activity;
 }

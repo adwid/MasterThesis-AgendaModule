@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../handlers/dbHandler');
 
 router.get("/:id", (req, res) => {
-    db.getAgenda(req.params.id)
+    db.getAgenda("http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/" + req.params.id)
         .then((result) => {
             if (!result) {
                 res.status(404).end();
