@@ -7,9 +7,10 @@ const requestHandler = require('../hanlders/requestHandler');
 const paths = {
     'close': {inboxDestination: '/close', generator: requestHandler.generateCreateCloseActivity},
     'create': {inboxDestination: '/', generator: requestHandler.generateCreateAgendaActivity},
-    'open': {inboxDestination: '/open', generator: requestHandler.generateCreateWithdrawOrOpenActivity},
+    'open': {inboxDestination: '/open', generator: requestHandler.generateCreateNoContentActivity},
+    'reset': {inboxDestination: '/reset', generator: requestHandler.generateCreateNoContentActivity},
     'vote': {inboxDestination: '/vote', generator: requestHandler.generateCreateVoteActivity},
-    'withdraw': {inboxDestination: '/withdraw', generator: requestHandler.generateCreateWithdrawOrOpenActivity},
+    'withdraw': {inboxDestination: '/withdraw', generator: requestHandler.generateCreateNoContentActivity},
 };
 
 router.post('/:path', (req, res, next) => {

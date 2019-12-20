@@ -72,6 +72,21 @@ function openAgenda(noteObject) {
     });
 }
 
+function resetAgenda(noteObject) {
+    const agendaID = noteObject.inReplyTo;
+    const userID = noteObject.attributedTo;
+    return AgendaModel.findOneAndUpdate({
+        _id: {$eq: agendaID},
+        "participants.0.id": userID
+    }, {
+        $set: {
+            "dates.$[].forIt": [],
+            "participants.$[].hasParticipated": false
+        },
+        $unset: {selectedDate: ""}
+    });
+}
+
 function withdrawVote(noteObject) {
     const agendaID = noteObject.inReplyTo;
     const userID = noteObject.attributedTo;
@@ -116,4 +131,12 @@ function documentToJSON(agenda) {
     return json;
 }
 
-module.exports = {applyVote, closeAgenda, createNewAgenda, getAgenda, getAgendaOf, openAgenda, withdrawVote,};
+module.exports = {
+    applyVote,
+    closeAgenda,
+    createNewAgenda,
+    getAgenda,
+    getAgendaOf,
+    openAgenda,
+    resetAgenda,
+    withdrawVote,};

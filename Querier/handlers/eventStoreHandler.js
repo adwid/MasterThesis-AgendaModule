@@ -11,6 +11,7 @@ eventCallback.set('vote', db.applyVote);
 eventCallback.set('withdraw', db.withdrawVote);
 eventCallback.set('close', db.closeAgenda);
 eventCallback.set('open', db.openAgenda);
+eventCallback.set('reset', db.resetAgenda);
 
 console.log('Subscribing to ' + streamId + "...");
 eventStore.subscribeToStream(streamId, true, function(streamEvent) {

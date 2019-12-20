@@ -23,7 +23,7 @@ function generateCreateVoteActivity(request) {
     return activity;
 }
 
-function generateCreateWithdrawOrOpenActivity(request) {
+function generateCreateNoContentActivity(request) {
     const specificObjectFields = objectFields.slice();
     var index = specificObjectFields.indexOf("content");
     if (index > -1) specificObjectFields.splice(index, 1);
@@ -129,6 +129,6 @@ function agendaNoteToCreateActivity(note) {
 module.exports = {
     generateCreateAgendaActivity,
     generateCreateCloseActivity,
+    generateCreateNoContentActivity,
     generateCreateVoteActivity,
-    generateCreateWithdrawOrOpenActivity
 };

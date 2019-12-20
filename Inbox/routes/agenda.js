@@ -22,6 +22,10 @@ router.post("/open", (req, res) => {
     postEvent(req.body, "open", res);
 });
 
+router.post("/reset", (req, res) => {
+    postEvent(req.body, "reset", res);
+});
+
 function postEvent(event, type, res) {
     esHandler.postEvent(event, type)
         .then(() => {
