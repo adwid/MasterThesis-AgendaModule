@@ -4,55 +4,27 @@ const axios = require('axios').default;
 const uuid = require('uuid/v4');
 const requestHandler = require('../hanlders/requestHandler');
 
-router.post('/create', (req, res) => {
-    const activity = requestHandler.generateCreateAgendaActivity(req.body);
+const paths = {
+    'close': {inboxDestination: '/close', generator: requestHandler.generateCreateCloseActivity},
+    'create': {inboxDestination: '/', generator: requestHandler.generateCreateAgendaActivity},
+    'open': {inboxDestination: '/open', generator: requestHandler.generateCreateWithdrawOrOpenActivity},
+    'vote': {inboxDestination: '/vote', generator: requestHandler.generateCreateVoteActivity},
+    'withdraw': {inboxDestination: '/withdraw', generator: requestHandler.generateCreateWithdrawOrOpenActivity},
+};
+
+router.post('/:path', (req, res, next) => {
+    if (!paths.hasOwnProperty(req.params.path)) {
+        next();
+        return;
+    }
+    const currentPath = paths[req.params.path];
+    const activity = currentPath.generator(req.body);
     if (!activity) {
         res.status(400).end();
         return;
     }
 
-    forwardToInbox(res, activity, '/', () => res.status(201).json(activity))
-});
-
-router.post("/vote", (req, res) => {
-    const activity = requestHandler.generateCreateVoteActivity(req.body);
-    if (!activity) {
-        res.status(400).end();
-        return;
-    }
-
-    forwardToInbox(res, activity, '/vote', () => res.status(201).json(activity))
-});
-
-router.post('/withdraw', (req, res) => {
-    const activity = requestHandler.generateCreateWithdrawOrOpenActivity(req.body);
-    if (!activity) {
-        res.status(400).end();
-        return;
-    }
-
-    forwardToInbox(res, activity, '/withdraw', () => res.status(201).json(activity))
-});
-
-router.post('/close', (req, res) => {
-    const activity = requestHandler.generateCreateCloseActivity(req.body);
-    if (!activity) {
-        res.status(400).end();
-        return;
-    }
-
-    forwardToInbox(res, activity, '/close', () => res.status(201).json(activity));
-});
-
-router.post('/open', (req, res) => {
-    const activity = requestHandler.generateCreateWithdrawOrOpenActivity(req.body);
-    if (!activity) {
-        res.status(400).end();
-        return;
-    }
-
-    forwardToInbox(res, activity, '/open', () => res.status(201).json(activity));
-
+    forwardToInbox(res, activity, currentPath.inboxDestination, () => res.status(201).json(activity))
 });
 
 function forwardToInbox(res, activity, path, callback) {
