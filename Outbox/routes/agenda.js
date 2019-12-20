@@ -27,7 +27,10 @@ router.post('/:path', (req, res, next) => {
 
     forwardToInboxes(activity, currentPath.inboxDestination)
         .then(_ => res.status(201).json(activity))
-        .catch(err => res.status(500).json({err: err}));
+        .catch(err => {
+            console.error("Error(s) while forwarding to inboxes : " + err);
+            res.status(500).json({error: "An internal occurred. Please try later or contact admins."})
+        });
 });
 
 function forwardToInboxes(activity, path) {
@@ -41,7 +44,8 @@ function forwardToInboxes(activity, path) {
             // todo manage gateway, general url and external inbox url case
             promises = [];
             for (const actor of actors) {
-                const promise = axios.post('http://127.0.0.1:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
+                const promise = axios.post('http://127.0.0.1:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity);
+                promises.push(promise);
             }
             return Promise.all(promises);
         });
