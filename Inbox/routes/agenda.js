@@ -2,40 +2,31 @@ const express = require('express');
 const router = express.Router();
 const esHandler = require('../handlers/eventStoreHandler');
 
-router.post("/", (req, res) => {
-    postEvent(req.body, "newAgenda", res);
-});
+const routes = [
+    "agenda",
+    "vote",
+    "withdraw",
+    "clode",
+    "open",
+    "reset",
+];
 
-router.post("/vote", (req, res) => {
-    postEvent(req.body, "vote", res);
-});
-
-router.post("/withdraw", (req, res) => {
-    postEvent(req.body, "withdraw", res);
-});
-
-router.post("/close", (req, res) => {
-    postEvent(req.body, "close", res);
-});
-
-router.post("/open", (req, res) => {
-    postEvent(req.body, "open", res);
-});
-
-router.post("/reset", (req, res) => {
-    postEvent(req.body, "reset", res);
-});
-
-function postEvent(event, type, res) {
-    esHandler.postEvent(event, type)
+router.post("/:route", (req, res, next) => {
+    if (!routes.includes(req.params.route)) {
+        next();
+        return;
+    }
+    let eventType = req.params.route;
+    if (eventType === "agenda") eventType = "newAgenda";
+    esHandler.postEvent(req.body, eventType)
         .then(() => {
-            res.end()
+            res.status(201).end()
         })
         .catch(() => {
             res.status(500).json({
                 error: "Internal error. Please try later or contact admins."
             });
         });
-}
+});
 
 module.exports = router;
