@@ -6,7 +6,7 @@ const routes = [
     "agenda",
     "vote",
     "withdraw",
-    "clode",
+    "close",
     "open",
     "reset",
 ];
