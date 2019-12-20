@@ -17,7 +17,6 @@ router.post("/:route", (req, res, next) => {
         return;
     }
     let eventType = req.params.route;
-    if (eventType === "agenda") eventType = "newAgenda";
     esHandler.postEvent(req.body, eventType)
         .then(() => {
             res.status(201).end()

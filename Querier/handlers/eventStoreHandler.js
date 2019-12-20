@@ -6,7 +6,7 @@ const db = require('./dbHandler');
 const streamId = "agenda";
 const eventCallback = new Map();
 
-eventCallback.set('newAgenda', db.createNewAgenda);
+eventCallback.set('agenda', db.createNewAgenda);
 eventCallback.set('vote', db.applyVote);
 eventCallback.set('withdraw', db.withdrawVote);
 eventCallback.set('close', db.closeAgenda);
