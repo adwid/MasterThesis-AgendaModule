@@ -6,11 +6,11 @@ const db = require('./dbHandler');
 const streamId = "agenda";
 const eventCallback = new Map();
 
-eventCallback.set('newAgenda', writeNewAgenda);
-eventCallback.set('vote', applyVote);
-eventCallback.set('withdraw', withdrawVote);
-eventCallback.set('close', closeAgenda);
-eventCallback.set('open', openAgenda);
+eventCallback.set('newAgenda', db.createNewAgenda);
+eventCallback.set('vote', db.applyVote);
+eventCallback.set('withdraw', db.withdrawVote);
+eventCallback.set('close', db.closeAgenda);
+eventCallback.set('open', db.openAgenda);
 
 console.log('Subscribing to ' + streamId + "...");
 eventStore.subscribeToStream(streamId, true, function(streamEvent) {
@@ -18,39 +18,14 @@ eventStore.subscribeToStream(streamId, true, function(streamEvent) {
         console.error("[ERR] ES : unkown event's type : " + streamEvent.eventType);
         return;
     }
+
     var callback = eventCallback.get(streamEvent.eventType);
-    callback(streamEvent.data.object); // Pass the note object of the activity
+
+    callback(streamEvent.data.object) // Pass the note object of the activity
+        .then(_ => console.log("Event " + streamEvent.eventType + " stored !"))
+        .catch(err => console.error("[ERR] database : " + err));
+
 }, onSubscriptionConfirmed, undefined, credentials, undefined);
-
-function writeNewAgenda(noteObject) {
-    db.createNewAgenda(noteObject)
-        .then(res => console.log("New agenda stored !"))
-        .catch(err => console.error("[ERR] database : " + err));
-}
-
-function applyVote(noteObject) {
-    db.applyVote(noteObject)
-        .then(res => console.log("New vote computed !"))
-        .catch(err => console.error("[ERR] database : " + err));
-}
-
-function withdrawVote(noteObject) {
-    db.withdrawVote(noteObject)
-        .then(res => console.log("Vote withdrew !"))
-        .catch(err => console.error("[ERR] database : " + err));
-}
-
-function closeAgenda(noteObject) {
-    db.closeAgenda((noteObject))
-        .then(res => console.log("Agenda closed !"))
-        .catch(err => console.error("[ERR] database : " + err));
-}
-
-function openAgenda(noteObject) {
-    db.openAgenda(noteObject)
-        .then(res => console.log("Agenda opened !"))
-        .catch(err => console.error("[ERR] database : " + err));
-}
 
 function onSubscriptionConfirmed(confirmation) {
     console.log("Subscription confirmed (last commit " + confirmation.lastCommitPosition + ", last event " + confirmation.lastEventNumber + ")");
