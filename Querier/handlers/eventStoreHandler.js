@@ -34,8 +34,8 @@ function applyVote(noteObject) {
         .catch(err => console.error("[ERR] database : " + err));
 }
 
-function withdrawVote(withdrawing) {
-    db.withdrawVote(withdrawing)
+function withdrawVote(noteObject) {
+    db.withdrawVote(noteObject)
         .then(res => console.log("Vote withdrew !"))
         .catch(err => console.error("[ERR] database : " + err));
 }

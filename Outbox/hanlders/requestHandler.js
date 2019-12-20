@@ -23,6 +23,17 @@ function generateCreateVoteActivity(request) {
     return activity;
 }
 
+function generateCreateWithdrawActivity(request) {
+    const specificObjectFields = objectFields.slice();
+    var index = specificObjectFields.indexOf("content");
+    if (index > -1) specificObjectFields.splice(index, 1);
+    const activity = generateCreateObjectActivity(request, specificObjectFields, ()=>{return true});
+    if (!activity) return undefined;
+    activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
+    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
+    return activity;
+}
+
 function generateCreateObjectActivity(request, objectFields, funIsValidObject) {
     let activity = undefined;
     if (!request) return undefined;
@@ -98,5 +109,6 @@ function agendaNoteToCreateActivity(note) {
 
 module.exports = {
     generateCreateAgendaActivity,
-    generateCreateVoteActivity
+    generateCreateVoteActivity,
+    generateCreateWithdrawActivity
 };

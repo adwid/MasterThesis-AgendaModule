@@ -25,7 +25,13 @@ router.post("/vote", (req, res) => {
 });
 
 router.post('/withdraw', (req, res) => {
-    forwardToInbox(res, req.body, '/withdraw', () => res.end())
+    const activity = requestHandler.generateCreateWithdrawActivity(req.body);
+    if (!activity) {
+        res.status(400).end();
+        return;
+    }
+
+    forwardToInbox(res, activity, '/withdraw', () => res.status(201).json(activity))
 });
 
 router.post('/close', (req, res) => {
