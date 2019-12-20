@@ -1,6 +1,4 @@
-const eventStoreManager = require('../eventStore');
-const eventStore = eventStoreManager.getES();
-const credentials = eventStoreManager.getCredentials();
+const esClient = require('../eventStore').getClient();
 const db = require('./dbHandler');
 
 const streamId = "agenda";
@@ -13,21 +11,24 @@ eventCallback.set('close', db.closeAgenda);
 eventCallback.set('open', db.openAgenda);
 eventCallback.set('reset', db.resetAgenda);
 
-console.log('Subscribing to ' + streamId + "...");
-eventStore.subscribeToStream(streamId, true, function(streamEvent) {
-    if (!eventCallback.has(streamEvent.eventType)) {
+esClient.subscribeToStream(streamId, false, onNewEvent)
+    .then(_ => {
+        console.log("Subscription confirmed (stream %s)", streamId);
+    })
+    .catch(err => {
+        console.error("[ERR] error with stream subscription (stream %s) : %s", streamId, err);
+        process.exit(1);
+    });
+
+function onNewEvent(sub, event) {
+    const eventType = event.originalEvent.eventType;
+    const activity = JSON.parse(event.originalEvent.data);
+    if (!eventCallback.has(eventType)) {
         console.error("[ERR] ES : unkown event's type : " + streamEvent.eventType);
         return;
     }
-
-    var callback = eventCallback.get(streamEvent.eventType);
-
-    callback(streamEvent.data.object) // Pass the note object of the activity
-        .then(_ => console.log("Event " + streamEvent.eventType + " stored !"))
+    var callback = eventCallback.get(eventType);
+    callback(activity.object) // Pass the note object of the activity
+        .then(_ => console.log("Event " + eventType + " stored !"))
         .catch(err => console.error("[ERR] database : " + err));
-
-}, onSubscriptionConfirmed, undefined, credentials, undefined);
-
-function onSubscriptionConfirmed(confirmation) {
-    console.log("Subscription confirmed (last commit " + confirmation.lastCommitPosition + ", last event " + confirmation.lastEventNumber + ")");
 }

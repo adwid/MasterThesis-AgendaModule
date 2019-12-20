@@ -1,49 +1,32 @@
-const eventStoreClient = require('event-store-client');
+const eventStore = require('node-eventstore-client');
+const uuid = require('uuid');
 
-var es = undefined;
+var esClient = undefined;
 
-var config = {
-    'eventStore': {
-        'address': "127.0.0.1",
-        'port': 1113,
-        'stream': '$stats-127.0.0.1:2113',
-        'credentials': {
-            'username': "admin",
-            'password': "changeit"
-        }
-    },
-    'debug': false
-};
-
-var options = {
-    host: config.eventStore.address,
-    port: config.eventStore.port,
-    debug: config.debug,
-    onConnect: () => console.log("Connected to EventStore !"),
-    onError: (err) => {
-        console.error("EventStore connection impossible (" + err + ")");
-        process.exit(1);
-    },
-    onClose: () => {
-        console.error("Connection with EventStore lost.");
-        process.exit(1);
+function getClient() {
+    if (esClient === undefined) {
+        var connSettings = {};  // Use defaults
+        esClient = eventStore.createConnection(connSettings, "tcp://localhost:1113", "AgendaModule");
+        esClient.connect();
+        esClient.once('connected', function (tcpEndPoint) {
+            console.log('Connected to eventstore at ' + tcpEndPoint.host + ":" + tcpEndPoint.port);
+        });
+        esClient.once('disconnected', noEventStoreConnection);
+        esClient.once('closed', noEventStoreConnection);
     }
-};
-
-function getES() {
-    if (es === undefined) es = new eventStoreClient.Connection(options);
-    return es;
+    return esClient;
 }
 
 function close() {
-    if (es !== undefined) {
-        es.close();
-        es = undefined;
+    if (esClient !== undefined) {
+        esClient.close();
+        esClient = undefined;
     }
 }
 
-function getCredentials() {
-    return config.eventStore.credentials;
+function noEventStoreConnection() {
+    console.error("An error occurred with the EventStore connection");
+    process.exit(1);
 }
 
-module.exports = { getES, getCredentials, close };
+module.exports = { getClient };
