@@ -25,18 +25,25 @@ router.post('/:path', (req, res, next) => {
         return;
     }
 
-    forwardToInbox(res, activity, currentPath.inboxDestination, () => res.status(201).json(activity))
+    forwardToInboxes(activity, currentPath.inboxDestination)
+        .then(_ => res.status(201).json(activity))
+        .catch(err => res.status(500).json({err: err}));
 });
 
-function forwardToInbox(res, activity, path, callback) {
-    // todo
-    return axios.post('http://localhost:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
-        .then(callback)
-        .catch(err => {
-            res.status(502).json({
-                error: "Error with the recipient's inbox."
-            });
-            console.error("[err] forwardToInbox : " + err)
+function forwardToInboxes(activity, path) {
+    const actorsIDs = activity.to;
+    let promises = [];
+    for (const id of actorsIDs) {
+        promises.push(axios.get(id));
+    }
+    return Promise.all(promises)
+        .then((actors) => {
+            // todo manage gateway, general url and external inbox url case
+            promises = [];
+            for (const actor of actors) {
+                const promise = axios.post('http://127.0.0.1:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity)
+            }
+            return Promise.all(promises);
         });
 }
 
