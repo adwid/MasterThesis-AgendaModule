@@ -61,9 +61,9 @@ function closeAgenda(noteObject) {
     });
 }
 
-function openAgenda(openCommand) {
-    const agendaID = openCommand.agendaID;
-    const userID = openCommand.from;
+function openAgenda(noteObject) {
+    const agendaID = noteObject.inReplyTo;
+    const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
         "participants.0.id": userID

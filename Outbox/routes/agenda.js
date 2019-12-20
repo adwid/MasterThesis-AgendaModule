@@ -25,7 +25,7 @@ router.post("/vote", (req, res) => {
 });
 
 router.post('/withdraw', (req, res) => {
-    const activity = requestHandler.generateCreateWithdrawActivity(req.body);
+    const activity = requestHandler.generateCreateWithdrawOrOpenActivity(req.body);
     if (!activity) {
         res.status(400).end();
         return;
@@ -45,7 +45,14 @@ router.post('/close', (req, res) => {
 });
 
 router.post('/open', (req, res) => {
-    forwardToInbox(res, req.body, "/open", () => res.end());
+    const activity = requestHandler.generateCreateWithdrawOrOpenActivity(req.body);
+    if (!activity) {
+        res.status(400).end();
+        return;
+    }
+
+    forwardToInbox(res, activity, '/open', () => res.status(201).json(activity));
+
 });
 
 function forwardToInbox(res, activity, path, callback) {

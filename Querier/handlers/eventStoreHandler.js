@@ -46,8 +46,8 @@ function closeAgenda(noteObject) {
         .catch(err => console.error("[ERR] database : " + err));
 }
 
-function openAgenda(openCommand) {
-    db.openAgenda(openCommand)
+function openAgenda(noteObject) {
+    db.openAgenda(noteObject)
         .then(res => console.log("Agenda opened !"))
         .catch(err => console.error("[ERR] database : " + err));
 }
