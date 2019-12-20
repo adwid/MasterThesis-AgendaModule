@@ -45,10 +45,10 @@ function applyVote(noteobject) {
         });
 }
 
-function closeAgenda(closeCommand) {
-    const agendaID = closeCommand.agendaID;
-    const selectedDate = closeCommand.date;
-    const userID = closeCommand.from;
+function closeAgenda(noteObject) {
+    const agendaID = noteObject.inReplyTo;
+    const selectedDate = noteObject.content.date;
+    const userID = noteObject.attributedTo;
     const findRequest = {
         _id: {$eq: agendaID},
         "participants.0.id": userID

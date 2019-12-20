@@ -34,6 +34,17 @@ function generateCreateWithdrawActivity(request) {
     return activity;
 }
 
+function generateCreateCloseActivity(request) {
+    const specificObjectFields = objectFields.slice();
+    specificObjectFields.push("inReplyTo");
+    const activity = generateCreateObjectActivity(request, specificObjectFields, isValidClose);
+    if (!activity) return undefined;
+    activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
+    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
+    return activity;
+
+}
+
 function generateCreateObjectActivity(request, objectFields, funIsValidObject) {
     let activity = undefined;
     if (!request) return undefined;
@@ -83,6 +94,14 @@ function isValidVote(content) {
     return true;
 }
 
+function isValidClose(content) {
+    if (!content
+        || !content.hasOwnProperty("date")
+        || !(isIsoDate(content.date) || content.date === "")
+    ) return false;
+    return true;
+}
+
 function isDatesArray(array, canBeEmpty) {
     if (!Array.isArray(array)) return false;
     return (array.length === 0 && canBeEmpty)
@@ -109,6 +128,7 @@ function agendaNoteToCreateActivity(note) {
 
 module.exports = {
     generateCreateAgendaActivity,
+    generateCreateCloseActivity,
     generateCreateVoteActivity,
     generateCreateWithdrawActivity
 };

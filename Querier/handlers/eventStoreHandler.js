@@ -40,8 +40,8 @@ function withdrawVote(noteObject) {
         .catch(err => console.error("[ERR] database : " + err));
 }
 
-function closeAgenda(closeCommand) {
-    db.closeAgenda((closeCommand))
+function closeAgenda(noteObject) {
+    db.closeAgenda((noteObject))
         .then(res => console.log("Agenda closed !"))
         .catch(err => console.error("[ERR] database : " + err));
 }

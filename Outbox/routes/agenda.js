@@ -35,7 +35,13 @@ router.post('/withdraw', (req, res) => {
 });
 
 router.post('/close', (req, res) => {
-    forwardToInbox(res, req.body, "/close", () => res.end());
+    const activity = requestHandler.generateCreateCloseActivity(req.body);
+    if (!activity) {
+        res.status(400).end();
+        return;
+    }
+
+    forwardToInbox(res, activity, '/close', () => res.status(201).json(activity));
 });
 
 router.post('/open', (req, res) => {
