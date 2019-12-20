@@ -1,31 +1,23 @@
-const eventStoreManager = require('../eventStore');
-const eventStore = eventStoreManager.getES();
-const esCredentials = eventStoreManager.getCredentials();
-const eventStoreClient = require('event-store-client');
+const eventStore = require('node-eventstore-client');
+const esClient = require('../eventStore').getClient();
+const hashObject = require('object-hash');
+const uuidFromString = require('uuid-by-string');
 
-const streamID = "agenda";
+const streamName = "agenda";
 
 function postEvent(content, type) {
-    const event = {
-        eventId: eventStoreManager.getNewID(),
-        eventType: type,
-        data: content
-    };
-    if (type === "newAgenda") {
-        event.data.agendaID = content.id;
-        delete event.data.id;
-    }
-    return write("agenda", [event]);
-}
-
-function write(streamID, eventsArray) {
-    return new Promise((resolve, reject) => {
-        eventStore.writeEvents(streamID, eventStoreManager.getExpectedVersion(), false, eventsArray, esCredentials, completed => {
-            console.log("Event written result: " + eventStoreClient.OperationResult.getName(completed.result));
-            if (completed.result === eventStoreClient.OperationResult.Success) resolve();
-            else reject();
+    const hash = hashObject(content);
+    const event = eventStore.createJsonEventData(uuidFromString(hash), content, undefined, type);
+    return esClient.appendToStream(streamName, eventStore.expectedVersion.any, event)
+        .then(() => {
+            console.log("Stored event of type " + type);
+            return Promise.resolve()
+        })
+        .catch((err) => {
+            console.log("An error occurred while writing event (type : " + type + ") : " + err);
+            return Promise.reject();
         });
-    });}
+}
 
 module.exports = {postEvent};
 

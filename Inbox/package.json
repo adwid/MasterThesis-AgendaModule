@@ -8,9 +8,11 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
-    "event-store-client": "^1.1.0",
     "express": "~4.16.1",
     "morgan": "~1.9.1",
-    "uuid": "^3.3.3"
+    "node-eventstore-client": "^0.2.15",
+    "object-hash": "^2.0.1",
+    "uuid": "^3.3.3",
+    "uuid-by-string": "^3.0.2"
   }
 }
