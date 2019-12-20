@@ -6,7 +6,9 @@ mongoose.Promise = global.Promise;
 
 exports.open = function openMongoDBConnection() {
     return mongoose.connect(connectionUrl, {
+        useCreateIndex: true,
         useNewUrlParser: true,
+        useFindAndModify: false,
         useUnifiedTopology: true
     })
         .then(() => console.log('Connected to %s', connectionUrl))
