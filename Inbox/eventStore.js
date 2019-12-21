@@ -1,5 +1,4 @@
 const eventStore = require('node-eventstore-client');
-const uuid = require('uuid');
 
 var esClient = undefined;
 
