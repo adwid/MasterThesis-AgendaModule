@@ -6,42 +6,28 @@ const uuid = require('uuid/v1');
 function generateCreateAgendaActivity(request) {
     const activity = generateCreateObjectActivity(request, objectFields, isValidAgenda);
     if (!activity) return undefined;
-    // todo the next id isn't correct... each participant will use the same server instead of using their server
-    activity.object.id = "http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/" + uuid();
-    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
+    // This note has a special ID since the url will always provide the updated version
+    activity.object.id = "http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/updated/" + uuid();
     return activity;
 }
 
 function generateCreateVoteActivity(request) {
     const specificObjectFields = objectFields.slice();
     specificObjectFields.push("inReplyTo");
-    const activity = generateCreateObjectActivity(request, specificObjectFields, isValidVote);
-    if (!activity) return undefined;
-    activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
-    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
-    return activity;
+    return generateCreateObjectActivity(request, specificObjectFields, isValidVote);
 }
 
 function generateCreateNoContentActivity(request) {
     const specificObjectFields = objectFields.slice();
     var index = specificObjectFields.indexOf("content");
     if (index > -1) specificObjectFields.splice(index, 1);
-    const activity = generateCreateObjectActivity(request, specificObjectFields);
-    if (!activity) return undefined;
-    activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
-    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
-    return activity;
+    return generateCreateObjectActivity(request, specificObjectFields);
 }
 
 function generateCreateCloseActivity(request) {
     const specificObjectFields = objectFields.slice();
     specificObjectFields.push("inReplyTo");
-    const activity = generateCreateObjectActivity(request, specificObjectFields, isValidClose);
-    if (!activity) return undefined;
-    activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
-    activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
-    return activity;
-
+    return generateCreateObjectActivity(request, specificObjectFields, isValidClose);
 }
 
 function generateCreateObjectActivity(request, objectFields, funIsValidContent) {
@@ -55,6 +41,8 @@ function generateCreateObjectActivity(request, objectFields, funIsValidContent) 
     }
     if (!activity) return undefined;
     activity.published = (new Date()).toISOString();
+    activity.object.id = "http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/" + uuid();
+    activity.id = "http://127.0.0.1:" + process.env.QUERIER_AGENDA_PORT + "/agenda/" + uuid()
     return activity;
 }
 
@@ -115,15 +103,13 @@ function isIsoDate(str) {
 }
 
 function agendaNoteToCreateActivity(note) {
-    const activity = {
+    return {
         "@context": "https://www.w3.org/ns/activitystreams",
         "type": "Create",
         "actor": note.attributedTo,
         "to": note.to,
         "object": note
     };
-
-    return activity;
 }
 
 module.exports = {
