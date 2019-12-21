@@ -1,7 +1,6 @@
 const createActivityFields = ["@context", "type", "actor", "object", "to"];
 const objectFields = ["@context", "type", "to", "attributedTo", "content", "mediaType"];
 const agendaFields = ["name", "description", "dates"];
-const voteFields = ["dates"];
 const uuid = require('uuid/v1');
 
 function generateCreateAgendaActivity(request) {
@@ -27,7 +26,7 @@ function generateCreateNoContentActivity(request) {
     const specificObjectFields = objectFields.slice();
     var index = specificObjectFields.indexOf("content");
     if (index > -1) specificObjectFields.splice(index, 1);
-    const activity = generateCreateObjectActivity(request, specificObjectFields, ()=>{return true});
+    const activity = generateCreateObjectActivity(request, specificObjectFields);
     if (!activity) return undefined;
     activity.object.id = uuid(); // todo create apprioriate url in order to retrieve the activity ?
     activity.id = uuid(); //todo create apprioriate url in order to retrieve the activity ?
@@ -45,13 +44,13 @@ function generateCreateCloseActivity(request) {
 
 }
 
-function generateCreateObjectActivity(request, objectFields, funIsValidObject) {
+function generateCreateObjectActivity(request, objectFields, funIsValidContent) {
     let activity = undefined;
     if (!request) return undefined;
-    if (request.type === 'Note' && isValidNote(request, objectFields, funIsValidObject)) {
-        activity = agendaNoteToCreateActivity(request, funIsValidObject);
+    if (request.type === 'Note' && isValidNote(request, objectFields, funIsValidContent)) {
+        activity = agendaNoteToCreateActivity(request, funIsValidContent);
     }
-    if (request.type === 'Create' && isValidCreateActivity(request, objectFields, funIsValidObject)) {
+    if (request.type === 'Create' && isValidCreateActivity(request, objectFields, funIsValidContent)) {
         activity = request;
     }
     if (!activity) return undefined;
@@ -59,21 +58,22 @@ function generateCreateObjectActivity(request, objectFields, funIsValidObject) {
     return activity;
 }
 
-function isValidCreateActivity(activity, objectFields, funIsContentValid) {
+function isValidCreateActivity(activity, objectFields, funIsValidContent) {
     if (!activity
         || !createActivityFields.every(field => activity.hasOwnProperty(field))
         || activity.type !== "Create"
-        || !isValidNote(activity.object, objectFields, funIsContentValid)
+        || !isValidNote(activity.object, objectFields, funIsValidContent)
     ) return false;
     return true;
 }
 
+// funIsValidContent can be undefined (-> does not check the note's content)
 function isValidNote(object, fields, funIsContentValid) {
     if (!object
         || !fields.every(field => object.hasOwnProperty(field))
         || object.type !== "Note"
         || object.mediaType !== "application/json"
-        || !funIsContentValid(object.content)
+        || (!!funIsContentValid && !funIsContentValid(object.content))
     ) return false;
     return true;
 }
