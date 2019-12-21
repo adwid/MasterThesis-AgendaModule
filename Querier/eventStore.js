@@ -6,7 +6,7 @@ var esClient = undefined;
 function getClient() {
     if (esClient === undefined) {
         var connSettings = {};  // Use defaults
-        esClient = eventStore.createConnection(connSettings, "tcp://localhost:1113", "AgendaModule");
+        esClient = eventStore.createConnection(connSettings, "tcp://localhost:1113", "AgendaModuleQuerier");
         esClient.connect();
         esClient.once('connected', function (tcpEndPoint) {
             console.log('Connected to eventstore at ' + tcpEndPoint.host + ":" + tcpEndPoint.port);
