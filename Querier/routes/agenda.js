@@ -34,6 +34,18 @@ router.get("/user/:id", (req, res) => {
         });
 });
 
+router.get("/from/:actor", (req, res) => {
+    esHandler.getActivitiesFromActor(req.params.actor)
+        .then(activities => {
+            if (activities.list.length === 0) res.status(204).end();
+            else res.json(activities.list);
+        })
+        .catch(err => {
+            console.error("[ERR] ES projection : " + err);
+            res.status(500).json({error: "Internal error. Please try later or contact admins"});
+        });
+});
+
 router.get("/:id", (req, res) => {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     esHandler.getSpecificObject(fullUrl)

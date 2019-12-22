@@ -1,6 +1,7 @@
 const esClient = require('../eventStore').getClient();
 const db = require('./dbHandler');
 const axios = require('axios');
+const projHandler = require('./projectionHandler');
 
 let isProjectionInitialized = false;
 const streamId = "agenda";
@@ -63,7 +64,16 @@ function initProjection() {
 }
 
 function getSpecificObject(id) {
-    const projection = generateProjectionQuery(id);
+    const projection = projHandler.generateGetObjectQuery(id);
+    return runProjection(projection);
+}
+
+function getActivitiesFromActor(actor) {
+    const projection = projHandler.generateGetActorActivitiesQuery(actor);
+    return runProjection(projection);
+}
+
+function runProjection(projection) {
     let initializeProjection = Promise.resolve();
     if (!isProjectionInitialized) initializeProjection = initProjection();
     return initializeProjection
@@ -82,32 +92,7 @@ function getSpecificObject(id) {
         });
 }
 
-function generateProjectionQuery(id) {
-    return "options({\n" +
-        "    $includeLinks: false,\n" +
-        "    reorderEvents: false,\n" +
-        "    processingLag: 0\n" +
-        "})\n" +
-        "\n" +
-        "fromStream('agenda')\n" +
-        ".when({\n" +
-        "    $init:function(){\n" +
-        "        return {\n" +
-        "            count: 0\n" +
-        "        }\n" +
-        "    },\n" +
-        "    $any: function(state, event){\n" +
-        "        if (event.data !== undefined) {\n" +
-        "            if (event.data.id === \"" + id + "\" \n" +
-        "            || (event.data.object !== undefined && event.data.object.id === \"" + id + "\")) {\n" +
-        "                state.count++;\n" +
-        "                state.activity = event.data;\n" +
-        "            }\n" +
-        "        }\n" +
-        "    }\n" +
-        "})";
-}
-
 module.exports = {
-    getSpecificObject
+    getActivitiesFromActor,
+    getSpecificObject,
 };
