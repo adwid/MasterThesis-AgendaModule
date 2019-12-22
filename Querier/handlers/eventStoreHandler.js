@@ -33,7 +33,7 @@ function onNewEvent(sub, event) {
     const eventType = event.originalEvent.eventType;
     const activity = JSON.parse(event.originalEvent.data);
     if (!eventCallback.has(eventType)) {
-        console.error("[ERR] ES : unkown event's type : " + streamEvent.eventType);
+        console.error("[ERR] ES : unkown event's type : " + eventType);
         return;
     }
     var callback = eventCallback.get(eventType);
