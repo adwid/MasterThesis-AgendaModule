@@ -8,7 +8,7 @@ const ParticipantSchema = new mongoose.Schema({
 });
 
 const DateSchema = new mongoose.Schema({
-    date: {type: String, required: true},
+    date: {type: Date, required: true},
     forIt: {type: [String], required: true}
 }, {
     _id: false
@@ -18,7 +18,7 @@ const AgendaSchema = new mongoose.Schema({
     _id: String,
     name: {type: String, required: true},
     description: {type: String, required: true},
-    selectedDate: String,
+    selectedDate: Date,
     dates: {
         type: [DateSchema],
         default: []
