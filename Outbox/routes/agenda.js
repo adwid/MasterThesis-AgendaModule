@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
-const uuid = require('uuid/v4');
 const requestHandler = require('../hanlders/requestHandler');
 
 const paths = {
