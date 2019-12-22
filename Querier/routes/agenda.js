@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../handlers/dbHandler');
+const esHandler = require('../handlers/eventStoreHandler');
 
 router.get("/updated/:id", (req, res) => {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
@@ -34,8 +35,17 @@ router.get("/user/:id", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-    // todo return activity
-    res.json({message: "Soon !"});
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    esHandler.getSpecificObject(fullUrl)
+        .then(object => {
+            if (object.count === 0) res.status(204).end();
+            else if (object.count === 1) res.json(object.activity);
+            else return Promise.reject("The projection counted more than one event for the ID : " + fullUrl);
+        })
+        .catch(err => {
+            console.error("[ERR] ES projection : " + err);
+            res.status(500).json({error: "Internal error. Please try later or contact admins"});
+        });
 });
 
 module.exports = router;
