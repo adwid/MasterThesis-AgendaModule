@@ -73,6 +73,11 @@ function getActivitiesFromActor(actor) {
     return runProjection(projection);
 }
 
+function getActivitiesToActor(recipient) {
+    const projection = projHandler.generateGetRecipientActivitiesQuery(recipient);
+    return runProjection(projection);
+}
+
 function runProjection(projection) {
     let initializeProjection = Promise.resolve();
     if (!isProjectionInitialized) initializeProjection = initProjection();
@@ -94,5 +99,6 @@ function runProjection(projection) {
 
 module.exports = {
     getActivitiesFromActor,
+    getActivitiesToActor,
     getSpecificObject,
 };
