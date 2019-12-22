@@ -1,26 +1,32 @@
 const eventStore = require('node-eventstore-client');
-const uuid = require('uuid');
 
-var esClient = undefined;
+var esConnection = undefined;
 
-function getClient() {
-    if (esClient === undefined) {
+function connection() {
+    if (esConnection === undefined) {
         var connSettings = {};  // Use defaults
-        esClient = eventStore.createConnection(connSettings, "tcp://localhost:1113", "AgendaModuleQuerier");
-        esClient.connect();
-        esClient.once('connected', function (tcpEndPoint) {
+        esConnection = eventStore.createConnection(connSettings, "tcp://localhost:1113", "AgendaModuleInbox");
+        esConnection.connect();
+        esConnection.once('connected', function (tcpEndPoint) {
             console.log('Connected to eventstore at ' + tcpEndPoint.host + ":" + tcpEndPoint.port);
         });
-        esClient.once('disconnected', noEventStoreConnection);
-        esClient.once('closed', noEventStoreConnection);
+        esConnection.once('disconnected', noEventStoreConnection);
+        esConnection.once('closed', noEventStoreConnection);
     }
-    return esClient;
+    return esConnection;
+}
+
+function getCredentials() {
+    return {
+        username: "admin",
+        password: "changeit"
+    }
 }
 
 function close() {
-    if (esClient !== undefined) {
-        esClient.close();
-        esClient = undefined;
+    if (esConnection !== undefined) {
+        esConnection.close();
+        esConnection = undefined;
     }
 }
 
@@ -29,4 +35,7 @@ function noEventStoreConnection() {
     process.exit(1);
 }
 
-module.exports = { getClient };
+module.exports = {
+    connection,
+    getCredentials,
+};

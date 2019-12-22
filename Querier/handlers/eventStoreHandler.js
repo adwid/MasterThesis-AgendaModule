@@ -1,4 +1,4 @@
-const esClient = require('../eventStore').getClient();
+const esClient = require('../eventStore');
 const db = require('./dbHandler');
 const axios = require('axios');
 const projHandler = require('./projectionHandler');
@@ -7,10 +7,8 @@ let isProjectionInitialized = false;
 const streamId = "agenda";
 const eventCallback = new Map();
 const projectionName = "projectionUsedByAgendaQuerier";
-const esCredentials = {
-    username: "admin",
-    password: "changeit"
-};
+const esConnection = esClient.connection();
+const esCredentials = esClient.getCredentials();
 
 eventCallback.set('agenda', db.createNewAgenda);
 eventCallback.set('vote', db.applyVote);
@@ -19,7 +17,7 @@ eventCallback.set('close', db.closeAgenda);
 eventCallback.set('open', db.openAgenda);
 eventCallback.set('reset', db.resetAgenda);
 
-esClient.subscribeToStream(streamId, false, onNewEvent)
+esConnection.subscribeToStream(streamId, false, onNewEvent)
     .then(_ => {
         console.log("Subscription confirmed (stream %s)", streamId);
     })
