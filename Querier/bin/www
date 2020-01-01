@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('querier:server');
+var debug = require('debug')('agenda_querier');
 var http = require('http');
 
 /**
