@@ -11,6 +11,7 @@
     "express": "~4.16.1",
     "morgan": "~1.9.1",
     "node-eventstore-client": "^0.2.15",
+    "nodemon": "^2.0.2",
     "object-hash": "^2.0.1",
     "uuid-by-string": "^3.0.2"
   }

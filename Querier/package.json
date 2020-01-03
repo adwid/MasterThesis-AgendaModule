@@ -12,6 +12,7 @@
     "express": "~4.16.1",
     "mongoose": "^5.8.1",
     "morgan": "~1.9.1",
-    "node-eventstore-client": "^0.2.15"
+    "node-eventstore-client": "^0.2.15",
+    "nodemon": "^2.0.2"
   }
 }
