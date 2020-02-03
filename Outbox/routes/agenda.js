@@ -43,7 +43,7 @@ function forwardToInboxes(activity, path) {
             // todo manage gateway, general url and external inbox url case
             promises = [];
             for (const actor of actors) {
-                const promise = axios.post('http://127.0.0.1:' + process.env.INBOX_AGENDA_PORT + '/agenda' + path, activity);
+                const promise = axios.post('http://10.42.0.1:' + process.env.AGENDA_INBOX_PORT + '/agenda' + path, activity);
                 promises.push(promise);
             }
             return Promise.all(promises);

@@ -46,7 +46,8 @@ function initProjection() {
     const body = "options({})\n" +
         "\n" +
         "fromStream('doesNotExist" + Date.now() + "')";
-    return axios.post("http://127.0.0.1:2113/projections/onetime?name="
+    // todo extract URL (in eventStore.js ?)
+    return axios.post("http://eventstore:2113/projections/onetime?name="
         + projectionName + "&type=JS&enabled=true&checkpoints=false&emit=false&trackemittedstreams=false",
         body, {auth: esCredentials})
         .catch(err => {
@@ -84,11 +85,11 @@ function runProjection(projection) {
             return Promise.reject("can not initialize the projection : " + err);
         })
         .then(_ => {
-            return axios.put("http://127.0.0.1:2113/projection/" + projectionName + "/query?type=JS&emit=false",
+            return axios.put("http://eventStore:2113/projection/" + projectionName + "/query?type=JS&emit=false",
                 projection, {auth: esCredentials});
         })
         .then(_ => {
-            return axios.get("http://127.0.0.1:2113/projection/" + projectionName + "/result", {auth: esCredentials});
+            return axios.get("http://eventStore:2113/projection/" + projectionName + "/result", {auth: esCredentials});
         })
         .then(response => {
             return Promise.resolve(response.data);
