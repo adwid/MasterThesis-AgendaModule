@@ -3,7 +3,7 @@ const router = express.Router();
 const esHandler = require('../handlers/eventStoreHandler');
 
 const routes = [
-    "agenda",
+    "create",
     "vote",
     "withdraw",
     "close",

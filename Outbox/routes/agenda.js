@@ -5,7 +5,7 @@ const requestHandler = require('../hanlders/requestHandler');
 
 const paths = {
     'close': {inboxDestination: '/close', generator: requestHandler.generateCreateCloseActivity},
-    'create': {inboxDestination: '/agenda', generator: requestHandler.generateCreateAgendaActivity},
+    'create': {inboxDestination: '/create', generator: requestHandler.generateCreateAgendaActivity},
     'open': {inboxDestination: '/open', generator: requestHandler.generateCreateNoContentActivity},
     'reset': {inboxDestination: '/reset', generator: requestHandler.generateCreateNoContentActivity},
     'vote': {inboxDestination: '/vote', generator: requestHandler.generateCreateVoteActivity},

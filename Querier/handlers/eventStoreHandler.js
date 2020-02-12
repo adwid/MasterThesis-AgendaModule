@@ -10,7 +10,7 @@ const projectionName = "projectionUsedByAgendaQuerier";
 const esConnection = esClient.connection();
 const esCredentials = esClient.getCredentials();
 
-eventCallback.set('agenda', db.createNewAgenda);
+eventCallback.set('create', db.createNewAgenda);
 eventCallback.set('vote', db.applyVote);
 eventCallback.set('withdraw', db.withdrawVote);
 eventCallback.set('close', db.closeAgenda);
