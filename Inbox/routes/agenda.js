@@ -11,7 +11,7 @@ const routes = [
     "reset",
 ];
 
-router.post("/:route", (req, res, next) => {
+router.post("/secretary/:route", (req, res, next) => {
     if (!routes.includes(req.params.route)) {
         next();
         return;
