@@ -3,51 +3,41 @@ const router = express.Router();
 const axios = require('axios').default;
 const requestHandler = require('../hanlders/requestHandler');
 
-const paths = {
-    'close': {inboxDestination: '/close', generator: requestHandler.generateCreateCloseActivity},
-    'create': {inboxDestination: '/create', generator: requestHandler.generateCreateAgendaActivity},
-    'open': {inboxDestination: '/open', generator: requestHandler.generateCreateNoContentActivity},
-    'reset': {inboxDestination: '/reset', generator: requestHandler.generateCreateNoContentActivity},
-    'vote': {inboxDestination: '/vote', generator: requestHandler.generateCreateVoteActivity},
-    'withdraw': {inboxDestination: '/withdraw', generator: requestHandler.generateCreateNoContentActivity},
+/*
+    TODO:
+        What return to a request ?
+        - The activity with an ID linked to the current url ?
+            But the outboxes do not have any DB to stock it
+            The inboxes have some stockage way but the ID will refer to the domain of the sender... not the receiver
+ */
+
+const routes = {
+    'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
+    'create': {inboxDestination: '/create', activityGenerator: requestHandler.generateCreateAgendaActivity},
+    'open': {inboxDestination: '/open', activityGenerator: requestHandler.generateCreateNoContentActivity},
+    'reset': {inboxDestination: '/reset', activityGenerator: requestHandler.generateCreateNoContentActivity},
+    'vote': {inboxDestination: '/vote', activityGenerator: requestHandler.generateCreateVoteActivity},
+    'withdraw': {inboxDestination: '/withdraw', activityGenerator: requestHandler.generateCreateNoContentActivity},
 };
 
-router.post('/:path', (req, res, next) => {
-    if (!paths.hasOwnProperty(req.params.path)) {
+router.post('/:route', (req, res, next) => {
+    if (!routes.hasOwnProperty(req.params.route)) {
         next();
         return;
     }
-    const currentPath = paths[req.params.path];
-    const activity = currentPath.generator(req.body);
+    const currentRoute = routes[req.params.route];
+    const activity = currentRoute.activityGenerator(req.body);
     if (!activity) {
         res.status(400).end();
         return;
     }
 
-    forwardToInboxes(activity, currentPath.inboxDestination)
-        .then(_ => res.status(201).json(activity))
+    axios.post('http://10.42.0.1:' + process.env.AGENDA_INBOX_PORT + '/agenda/secretary' + currentRoute.inboxDestination, activity)
+        .then(_ => res.status(201).end())
         .catch(err => {
-            console.error("Error(s) while forwarding to inboxes : " + err);
+            console.error("Error(s) while forwarding to secretary : " + err);
             res.status(500).json({error: "An internal occurred. Please try later or contact admins."})
         });
 });
-
-function forwardToInboxes(activity, path) {
-    const actorsIDs = activity.to;
-    let promises = [];
-    for (const id of actorsIDs) {
-        promises.push(axios.get(id));
-    }
-    return Promise.all(promises)
-        .then((actors) => {
-            // todo manage gateway, general url and external inbox url case
-            promises = [];
-            for (const actor of actors) {
-                const promise = axios.post('http://10.42.0.1:' + process.env.AGENDA_INBOX_PORT + '/agenda' + path, activity);
-                promises.push(promise);
-            }
-            return Promise.all(promises);
-        });
-}
 
 module.exports = router;
