@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const esHandler = require('../handlers/eventStoreHandler');
+const { v1: uuid } = require('uuid');
 
 const routes = [
     "create",
@@ -17,7 +18,12 @@ router.post("/secretary/:route", (req, res, next) => {
         return;
     }
     let eventType = req.params.route;
-    esHandler.postEvent(req.body, eventType)
+    let activity = req.body;
+    // todo does it make sense that the receiver add an ID based on
+    //  its own domain when the object comes from outsite the domain ?!...
+    activity.object.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    activity.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    esHandler.postEvent(activity, eventType)
         .then(() => {
             res.status(201).end()
         })

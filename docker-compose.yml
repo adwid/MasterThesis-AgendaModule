@@ -28,6 +28,8 @@ services:
       - "${AGENDA_INBOX_PORT}:${HOST_PORT}"
     depends_on:
       - eventstore
+    env_file:
+      - .env
 
   agenda-outbox:
     container_name: agenda-outbox
