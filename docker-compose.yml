@@ -60,3 +60,5 @@ services:
     depends_on:
       - eventstore
       - agenda-querier-db
+    env_file:
+      - .env

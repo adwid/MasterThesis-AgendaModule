@@ -10,8 +10,8 @@ function createNewAgenda(noteObject) {
         participants: []
     };
     newAgendaContent.participants.push({id: noteObject.attributedTo});
-    for (const t of noteObject.to) {
-        newAgendaContent.participants.push({id: t});
+    for (const participant of agenda.with) {
+        newAgendaContent.participants.push({id: participant});
     }
     for (const d of agenda.dates) {
         newAgendaContent.dates.push({date: d, forIt: []});

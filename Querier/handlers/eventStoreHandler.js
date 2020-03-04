@@ -2,6 +2,7 @@ const esClient = require('../eventStore');
 const db = require('./dbHandler');
 const axios = require('axios');
 const projHandler = require('./projectionHandler');
+const request = require('./requestHandler');
 
 let isProjectionInitialized = false;
 const streamId = "agenda";
@@ -32,14 +33,18 @@ initProjection()
 function onNewEvent(sub, event) {
     const eventType = event.originalEvent.eventType;
     const activity = JSON.parse(event.originalEvent.data);
+    if (eventType === "message") {
+        console.log("Message received and available to the recipient(s) !");
+        return;
+    }
     if (!eventCallback.has(eventType)) {
         console.error("[ERR] ES : unkown event's type : " + eventType);
         return;
     }
-    var callback = eventCallback.get(eventType);
-    callback(activity.object) // Pass the note object of the activity
-        .then(_ => console.log("Event " + eventType + " stored !"))
-        .catch(err => console.error("[ERR] database : " + err));
+    var updateDB = eventCallback.get(eventType);
+    updateDB(activity.object) // Pass the note object of the activity and store it to DB
+        .then(request.forwardObjectToInboxes)
+        .catch(err => console.log(""+err));
 }
 
 function initProjection() {
