@@ -76,6 +76,7 @@ function isValidAgenda(content) {
 function isValidVote(content) {
     if (!content
         || !content.hasOwnProperty("dates")
+        || !content.hasOwnProperty("agendaID")
         || !isDatesArray(content.dates, true)
     ) return false;
     return true;

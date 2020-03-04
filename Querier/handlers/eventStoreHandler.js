@@ -6,17 +6,18 @@ const request = require('./requestHandler');
 
 let isProjectionInitialized = false;
 const streamId = "agenda";
-const eventCallback = new Map();
 const projectionName = "projectionUsedByAgendaQuerier";
 const esConnection = esClient.connection();
 const esCredentials = esClient.getCredentials();
 
-eventCallback.set('create', db.createNewAgenda);
-eventCallback.set('vote', db.applyVote);
-eventCallback.set('withdraw', db.withdrawVote);
-eventCallback.set('close', db.closeAgenda);
-eventCallback.set('open', db.openAgenda);
-eventCallback.set('reset', db.resetAgenda);
+const eventCallback = {
+    'create':   {dbCallback: db.createNewAgenda,    mustBeForwarded: true},
+    'vote':     {dbCallback: db.applyVote,          mustBeForwarded: false},
+    'withdraw': {dbCallback: db.withdrawVote,       mustBeForwarded: false},
+    'close':    {dbCallback: db.closeAgenda,        mustBeForwarded: true},
+    'open':     {dbCallback: db.openAgenda,         mustBeForwarded: true},
+    'reset':    {dbCallback: db.resetAgenda,        mustBeForwarded: true},
+};
 
 esConnection.subscribeToStream(streamId, false, onNewEvent)
     .then(_ => {
@@ -37,14 +38,20 @@ function onNewEvent(sub, event) {
         console.log("Message received and available to the recipient(s) !");
         return;
     }
-    if (!eventCallback.has(eventType)) {
+    if (!eventCallback.hasOwnProperty(eventType)) {
         console.error("[ERR] ES : unkown event's type : " + eventType);
         return;
     }
-    var updateDB = eventCallback.get(eventType);
+    var updateDB = eventCallback[eventType].dbCallback;
     updateDB(activity.object) // Pass the note object of the activity and store it to DB
-        .then(request.forwardObjectToInboxes)
-        .catch(err => console.log(""+err));
+        .then(objectSaved => {
+            if (eventCallback[eventType].mustBeForwarded) {
+                return request.forwardObjectToInboxes(objectSaved)
+            }
+            console.log("Event " + eventType + ": DB updated");
+            return Promise.resolve();
+        })
+        .catch(err => console.log("" + err));
 }
 
 function initProjection() {

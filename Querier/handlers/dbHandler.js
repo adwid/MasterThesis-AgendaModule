@@ -21,7 +21,7 @@ function createNewAgenda(noteObject) {
 }
 
 function applyVote(noteobject) {
-    const agendaID = noteobject.inReplyTo;
+    const agendaID = noteobject.content.agendaID;
     const userID = noteobject.attributedTo;
     const dates = noteobject.content.dates;
     return withdrawVote(noteobject)
@@ -30,7 +30,7 @@ function applyVote(noteobject) {
                 _id: {$eq: agendaID},
                 selectedDate: {$exists: false}
             }, {
-                $push: {
+                $addToSet: {
                     "dates.$[element].forIt": userID,
                 },
                 $set: {
