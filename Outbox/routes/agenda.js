@@ -14,10 +14,10 @@ const requestHandler = require('../hanlders/requestHandler');
 const routes = {
     'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
     'create': {inboxDestination: '/create', activityGenerator: requestHandler.generateCreateAgendaActivity},
-    'open': {inboxDestination: '/open', activityGenerator: requestHandler.generateCreateNoContentActivity},
-    'reset': {inboxDestination: '/reset', activityGenerator: requestHandler.generateCreateNoContentActivity},
+    'open': {inboxDestination: '/open', activityGenerator: requestHandler.generateCreateAgendaIDActivity},
+    'reset': {inboxDestination: '/reset', activityGenerator: requestHandler.generateCreateAgendaIDActivity},
     'vote': {inboxDestination: '/vote', activityGenerator: requestHandler.generateCreateVoteActivity},
-    'withdraw': {inboxDestination: '/withdraw', activityGenerator: requestHandler.generateCreateNoContentActivity},
+    'withdraw': {inboxDestination: '/withdraw', activityGenerator: requestHandler.generateCreateAgendaIDActivity},
 };
 
 router.post('/:route', (req, res, next) => {

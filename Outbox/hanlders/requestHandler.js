@@ -16,11 +16,11 @@ function generateCreateVoteActivity(request) {
     return generateCreateObjectActivity(request, specificObjectFields, isValidVote);
 }
 
-function generateCreateNoContentActivity(request) {
+function generateCreateAgendaIDActivity(request) {
     const specificObjectFields = objectFields.slice();
     var index = specificObjectFields.indexOf("content");
     if (index > -1) specificObjectFields.splice(index, 1);
-    return generateCreateObjectActivity(request, specificObjectFields);
+    return generateCreateObjectActivity(request, specificObjectFields, isAgendaIDProvided);
 }
 
 function generateCreateCloseActivity(request) {
@@ -82,6 +82,15 @@ function isValidVote(content) {
     return true;
 }
 
+function isAgendaIDProvided(content) {
+    if (!content
+        || !content.hasOwnProperty("agendaID")
+        || content.agendaID === "") {
+        return false;
+    }
+    return true;
+}
+
 function isValidClose(content) {
     if (!content
         || !content.hasOwnProperty("date")
@@ -115,6 +124,6 @@ function agendaNoteToCreateActivity(note) {
 module.exports = {
     generateCreateAgendaActivity,
     generateCreateCloseActivity,
-    generateCreateNoContentActivity,
+    generateCreateAgendaIDActivity,
     generateCreateVoteActivity,
 };

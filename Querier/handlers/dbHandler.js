@@ -88,7 +88,7 @@ function resetAgenda(noteObject) {
 }
 
 function withdrawVote(noteObject) {
-    const agendaID = noteObject.inReplyTo;
+    const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
