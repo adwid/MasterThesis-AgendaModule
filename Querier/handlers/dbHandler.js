@@ -77,7 +77,7 @@ function openAgenda(noteObject) {
 }
 
 function resetAgenda(noteObject) {
-    const agendaID = noteObject.inReplyTo;
+    const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
@@ -88,6 +88,8 @@ function resetAgenda(noteObject) {
             "participants.$[].hasParticipated": false
         },
         $unset: {selectedDate: ""}
+    }, {
+        new: true
     });
 }
 
