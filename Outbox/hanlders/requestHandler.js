@@ -96,6 +96,7 @@ function isValidClose(content) {
     if (!content
         || !content.hasOwnProperty("date")
         || !(isIsoDate(content.date) || content.date === "")
+        || !isAgendaIDProvided(content)
     ) return false;
     return true;
 }

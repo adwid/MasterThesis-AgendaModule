@@ -45,10 +45,11 @@ function onNewEvent(sub, event) {
     var updateDB = eventCallback[eventType].dbCallback;
     updateDB(activity.object) // Pass the note object of the activity and store it to DB
         .then(objectSaved => {
-            if (eventCallback[eventType].mustBeForwarded) {
-                return request.forwardObjectToInboxes(objectSaved)
-            }
+            if (!objectSaved) return Promise.resolve();
             console.log("Event " + eventType + ": DB updated");
+            if (eventCallback[eventType].mustBeForwarded) {
+                return request.forwardObjectToInboxes(objectSaved, eventType === "create")
+            }
             return Promise.resolve();
         })
         .catch(err => console.log("" + err));

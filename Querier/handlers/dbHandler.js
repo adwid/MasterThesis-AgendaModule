@@ -46,7 +46,7 @@ function applyVote(noteobject) {
 }
 
 function closeAgenda(noteObject) {
-    const agendaID = noteObject.inReplyTo;
+    const agendaID = noteObject.content.agendaID;
     const selectedDate = noteObject.content.date;
     const userID = noteObject.attributedTo;
     const findRequest = {
@@ -58,6 +58,8 @@ function closeAgenda(noteObject) {
     }
     return AgendaModel.findOneAndUpdate(findRequest, {
         $set: {selectedDate: selectedDate}
+    }, {
+        new: true
     });
 }
 

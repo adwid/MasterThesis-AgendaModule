@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-function forwardObjectToInboxes(dbObject) {
-    const activity = objectToActivity(dbObject);
+function forwardObjectToInboxes(dbObject, isCreated) {
+    const activity = objectToActivity(dbObject, isCreated);
     const promises = [];
 
     for (let recipient of activity.to) {
@@ -17,7 +17,7 @@ function forwardObjectToInboxes(dbObject) {
     return Promise.all(promises);
 }
 
-function objectToActivity(object) {
+function objectToActivity(object, isCreated) {
     const secretary = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT; // TODO CREATE AN ACTOR FOR THE AGENDA MODULE
     const to = [];
     const id = object._id;
@@ -27,7 +27,7 @@ function objectToActivity(object) {
     return {
         "@context": "https://www.w3.org/ns/activitystreams",
         "id": id,
-        "type": "Create",
+        "type": isCreated ? "Create" : "Update",
         "to": to,
         "actor": secretary,
         "object": {
