@@ -64,13 +64,15 @@ function closeAgenda(noteObject) {
 }
 
 function openAgenda(noteObject) {
-    const agendaID = noteObject.inReplyTo;
+    const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
         "participants.0.id": userID
     }, {
         $unset: {selectedDate: ""}
+    }, {
+        new: true
     });
 }
 

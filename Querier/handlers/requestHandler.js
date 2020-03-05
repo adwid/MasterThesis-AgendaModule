@@ -24,7 +24,7 @@ function objectToActivity(object, isCreated) {
     object["_id"] = undefined;
     object["__v"] = undefined;
     for (let participant of object.participants) to.push(participant.id);
-    return {
+    let activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "id": id,
         "type": isCreated ? "Create" : "Update",
@@ -38,7 +38,9 @@ function objectToActivity(object, isCreated) {
             "to": to,
             "content": object
         }
-    }
+    };
+    if (!isCreated) activity["updated"] = (new Date()).toISOString();
+    return activity
 }
 
 module.exports = {
