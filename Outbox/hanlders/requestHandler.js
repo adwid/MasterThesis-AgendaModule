@@ -40,6 +40,7 @@ function generateCreateObjectActivity(request, objectFields, funIsValidContent) 
     }
     if (!activity) return undefined;
     activity.published = (new Date()).toISOString();
+    // todo clean ?
     // activity.object.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
     // activity.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
     return activity;
