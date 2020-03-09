@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
-const requestHandler = require('../hanlders/requestHandler');
+const requestHandler = require('../handlers/requestHandler');
 
 /*
     TODO:
