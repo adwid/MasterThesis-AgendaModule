@@ -10,7 +10,7 @@ function createNewAgenda(noteObject) {
         participants: []
     };
     newAgendaContent.participants.push({id: noteObject.attributedTo});
-    for (const participant of agenda.with) {
+    for (const participant of noteObject.to) {
         newAgendaContent.participants.push({id: participant});
     }
     for (const d of agenda.dates) {
