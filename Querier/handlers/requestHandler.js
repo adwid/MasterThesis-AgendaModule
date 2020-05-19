@@ -1,20 +1,25 @@
+const actorHandler = require("./actorHandler");
 const axios = require('axios');
 
 function forwardObjectToInboxes(dbObject, isCreated) {
     const activity = objectToActivity(dbObject, isCreated);
     const promises = [];
 
-    for (let recipient of activity.to) {
-        promises.push(
-            axios.post(
-                "http://10.42.0.1:" + process.env.AGENDA_INBOX_PORT + "/agenda/message",
-                activity
-            ).
-            catch(err => console.log("Err while forwarding to " + recipient + " : " + err))
-        );
-    }
+    return actorHandler.getInboxAddresses(activity.to)
+        .then(inboxes => {
+            for (let inbox of inboxes) promises.push(
+                axios.post(convertAddress(inbox), activity)
+                    .catch(err => console.log("Err while forwarding to " + inbox + " : " + err))
+            );
 
-    return Promise.all(promises);
+            return Promise.all(promises);
+        });
+}
+
+function convertAddress(addr) {
+    let regExp = /https?:\/\/([0-9]{1,3}\.){3,3}[0-9]:[0-9]+(\/inbox)?\/([A-Z]*[a-z]*[0-9]*)+/gi;
+    let url = addr.match(regExp) ? "http://" + process.env.HOST + ":" + process.env.AGENDA_INBOX_PORT : recipient.data.inbox;
+    return url + "/agenda/message"
 }
 
 function objectToActivity(object, isCreated) {
