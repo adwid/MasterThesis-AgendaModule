@@ -3,14 +3,6 @@ const router = express.Router();
 const axios = require('axios').default;
 const requestHandler = require('../handlers/requestHandler');
 
-/*
-    TODO:
-        What return to a request ?
-        - The activity with an ID linked to the current url ?
-            But the outboxes do not have any DB to stock it
-            The inboxes have some stockage way but the ID will refer to the domain of the sender... not the receiver
- */
-
 const routes = {
     'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
     'create': {inboxDestination: '/create', activityGenerator: requestHandler.generateCreateAgendaActivity},
