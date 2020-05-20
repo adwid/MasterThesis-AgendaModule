@@ -1,8 +1,9 @@
 const actorHandler = require("./actorHandler");
 const axios = require('axios');
+const { v1: uuid } = require('uuid');
 
-function forwardObjectToInboxes(dbObject, isCreated) {
-    const activity = objectToActivity(dbObject, isCreated);
+function forwardObjectToInboxes(dbObject, type) {
+    const activity = objectToActivity(dbObject, type);
     const promises = [];
 
     return actorHandler.getInboxAddresses(activity.to)
@@ -22,29 +23,29 @@ function convertAddress(addr) {
     return url + "/agenda/message"
 }
 
-function objectToActivity(object, isCreated) {
-    const secretary = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT; // TODO CREATE AN ACTOR FOR THE AGENDA MODULE
+function objectToActivity(object, type) {
+    const secretary = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + '/agenda/secretary'; // TODO CREATE AN ACTOR FOR THE AGENDA MODULE (or response to url)
     const to = [];
-    const id = object._id;
-    object["_id"] = undefined;
-    object["__v"] = undefined;
     for (let participant of object.participants) to.push(participant.id);
     let activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
-        "id": id,
-        "type": isCreated ? "Create" : "Update",
+        "id": "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid(),
+        "type": "Create",
         "to": to,
         "actor": secretary,
         "object": {
             "@context": "https://www.w3.org/ns/activitystreams",
+            "id": "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid(),
             "type": "Note",
             "mediaType": "application/json",
             "attributedTo": secretary,
             "to": to,
-            "content": object
+            "content": {
+                "url": object._id,
+                "type": type
+            }
         }
     };
-    if (!isCreated) activity["updated"] = (new Date()).toISOString();
     return activity
 }
 

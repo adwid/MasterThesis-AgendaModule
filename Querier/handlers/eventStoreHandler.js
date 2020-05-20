@@ -35,7 +35,9 @@ function onNewEvent(sub, event) {
     const eventType = event.originalEvent.eventType;
     const activity = JSON.parse(event.originalEvent.data);
     if (eventType === "message") {
-        console.log("Message received and available to the recipient(s) !");
+        db.storeMessage(activity.object).then(_ => {
+            console.log("Message received and available to the recipient(s) !");
+        }).catch(err => console.error("[ERR] storeMessage err ; " + err));
         return;
     }
     if (!eventCallback.hasOwnProperty(eventType)) {
@@ -48,7 +50,7 @@ function onNewEvent(sub, event) {
             if (!objectSaved) return Promise.resolve();
             console.log("Event " + eventType + ": DB updated");
             if (eventCallback[eventType].mustBeForwarded) {
-                return request.forwardObjectToInboxes(objectSaved, eventType === "create")
+                return request.forwardObjectToInboxes(objectSaved, eventType)
             }
             return Promise.resolve();
         })

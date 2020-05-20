@@ -58,6 +58,22 @@ router.get("/to/:recipient", (req, res) => {
         });
 });
 
+router.get("/content/:id", (req, res) => {
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    db.getAgenda(fullUrl)
+        .then((result) => {
+            if (!result) {
+                res.status(404).end();
+                return;
+            }
+            res.json(result);
+        })
+        .catch((err) => {
+            console.error("[ERR] GET ID : " + err);
+            res.status(500).json({error: "Internal error. Please try later or contact admins"});
+        })
+});
+
 router.get("/:id", (req, res) => {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     esHandler.getSpecificObject(fullUrl)

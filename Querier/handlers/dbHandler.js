@@ -1,9 +1,11 @@
 const AgendaModel = require('../models/agenda');
+const MessageModel = require('../models/message');
+const { v1: uuid } = require('uuid');
 
 function createNewAgenda(noteObject) {
     const agenda = noteObject.content;
     const newAgendaContent = {
-        _id: noteObject.id,
+        _id: "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/content/" + uuid(),
         name: agenda.name,
         description: agenda.description,
         dates: [],
@@ -63,6 +65,30 @@ function closeAgenda(noteObject) {
     });
 }
 
+function getNewMessages(uid) {
+    return MessageModel.find({
+        to: uid,
+        seen: false
+    }).then(messages => {
+        const promises = [];
+        for (const message of messages) {
+            promises.push(message.update({
+                $set: {seen: true}
+            }).catch(err => {
+                console.error("[ERR] db update : " + err)
+            }));
+        }
+        promises.push(Promise.resolve(messages)); // keep messages for next step
+        return Promise.all(promises);
+    }).then(resolvedPromises => {
+        const jsonMessages = [];
+        if (resolvedPromises.length  === 0) return Promise.resolve(jsonMessages);
+        const messages = resolvedPromises[resolvedPromises.length - 1];
+        for (const message of messages) jsonMessages.push(message.toJSON());
+        return Promise.resolve(jsonMessages);
+    });
+}
+
 function openAgenda(noteObject) {
     const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
@@ -91,6 +117,26 @@ function resetAgenda(noteObject) {
     }, {
         new: true
     });
+}
+
+function storeMessage(noteObject) {
+    const promises = [];
+    for (const recipient of noteObject.to) {
+        const url = new URL(recipient);
+        if (url.hostname === process.env.HOST) // only store for users of the current Agenda Module's domain
+            promises.push(storeMessageAux(noteObject, recipient))
+    }
+    return Promise.all(promises)
+}
+
+function storeMessageAux(noteObject, to) {
+    const message = new MessageModel({
+        to: to,
+        url: noteObject.content.url,
+        text: noteObject.content.type
+    });
+    return message.save()
+        .catch(err => console.error("[ERR]: not able to save message : " + err))
 }
 
 function withdrawVote(noteObject) {
@@ -143,6 +189,8 @@ module.exports = {
     createNewAgenda,
     getAgenda,
     getAgendaOf,
+    getNewMessages,
     openAgenda,
     resetAgenda,
+    storeMessage,
     withdrawVote,};
