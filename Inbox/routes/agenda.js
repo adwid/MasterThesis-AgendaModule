@@ -21,8 +21,8 @@ router.post("/secretary/:route", (req, res, next) => {
     let activity = req.body;
     // todo does it make sense that the receiver add an ID based on
     //  its own domain when the object comes from outsite the domain ?!...
-    activity.object.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
-    activity.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    activity.object.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    activity.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
     postEvent(activity, eventType, res);
 });
 

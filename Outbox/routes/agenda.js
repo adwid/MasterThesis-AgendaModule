@@ -26,7 +26,7 @@ router.post('/:route', (req, res, next) => {
 
     // todo extract author's address and forward to its secretary !
 
-    axios.post('http://10.42.0.1:' + process.env.AGENDA_INBOX_PORT + '/agenda/secretary' + currentRoute.inboxDestination, activity)
+    axios.post(process.env.PREFIX + process.env.HOST + ':' + process.env.AGENDA_INBOX_PORT + '/agenda/secretary' + currentRoute.inboxDestination, activity)
         .then(_ => res.status(201).end())
         .catch(err => {
             console.error("Error(s) while forwarding to secretary : " + err);

@@ -6,7 +6,7 @@ const uuid = require('uuid/v1');
 function generateCreateAgendaActivity(request) {
     const activity = generateCreateObjectActivity(request, objectFields, isValidAgenda);
     if (!activity) return undefined;
-    // activity.object.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/updated/" + uuid();
+    // activity.object.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/updated/" + uuid();
     return activity;
 }
 
@@ -41,8 +41,8 @@ function generateCreateObjectActivity(request, objectFields, funIsValidContent) 
     if (!activity) return undefined;
     activity.published = (new Date()).toISOString();
     // todo clean ?
-    // activity.object.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
-    // activity.id = "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    // activity.object.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
+    // activity.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
     return activity;
 }
 

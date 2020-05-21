@@ -5,7 +5,7 @@ const { v1: uuid } = require('uuid');
 function createNewAgenda(noteObject) {
     const agenda = noteObject.content;
     const newAgendaContent = {
-        _id: "http://10.42.0.1:" + process.env.AGENDA_QUERIER_PORT + "/agenda/content/" + uuid(),
+        _id: process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/content/" + uuid(),
         name: agenda.name,
         description: agenda.description,
         dates: [],
