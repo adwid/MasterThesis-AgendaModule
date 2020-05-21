@@ -82,16 +82,6 @@ function getSpecificObject(id) {
     return runProjection(projection);
 }
 
-function getActivitiesFromActor(actor) {
-    const projection = projHandler.generateGetActorActivitiesQuery(actor);
-    return runProjection(projection);
-}
-
-function getActivitiesToActor(recipient) {
-    const projection = projHandler.generateGetRecipientActivitiesQuery(recipient);
-    return runProjection(projection);
-}
-
 function runProjection(projection) {
     let initializeProjection = Promise.resolve();
     if (!isProjectionInitialized) initializeProjection = initProjection();
@@ -112,7 +102,5 @@ function runProjection(projection) {
 }
 
 module.exports = {
-    getActivitiesFromActor,
-    getActivitiesToActor,
     getSpecificObject,
 };

@@ -172,7 +172,7 @@ function getAgenda(id) {
         });
 }
 
-function getAgendaOf(userID) {
+function getAgendaWith(userID) {
     return AgendaModel.find({"participants.id": {$eq: userID}})
         .then(agendas => {
             for (const index in agendas) agendas[index] = documentToJSON(agendas[index]);
@@ -194,7 +194,7 @@ module.exports = {
     closeAgenda,
     createNewAgenda,
     getAgenda,
-    getAgendaOf,
+    getAgendaWith,
     getAllMessages,
     getNewMessages,
     openAgenda,
