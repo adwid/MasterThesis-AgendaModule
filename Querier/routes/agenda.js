@@ -58,6 +58,16 @@ router.get("/to/:recipient", (req, res) => {
         });
 });
 
+router.get("/secretary", (req, res) => {
+    res.json({
+        "@context": "http://www.w3.org/ns/activitystreams",
+        "type": "Application",
+        "name": "Agenda module secretariat",
+        "summary": "In charge of processing all messages concerning the agenda module (domain " +
+            process.env.PREFIX + process.env.HOST + ")"
+    })
+});
+
 router.get("/content/:id", (req, res) => {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
     db.getAgenda(fullUrl)

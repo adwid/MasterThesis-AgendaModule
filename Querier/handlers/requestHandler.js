@@ -24,7 +24,7 @@ function convertAddress(addr) {
 }
 
 function objectToActivity(object, type) {
-    const secretary = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + '/agenda/secretary'; // TODO CREATE AN ACTOR FOR THE AGENDA MODULE (or response to url)
+    const secretary = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + '/agenda/secretary';
     const to = [];
     for (let participant of object.participants) to.push(participant.id);
     let activity = {
