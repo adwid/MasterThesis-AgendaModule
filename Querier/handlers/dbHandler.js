@@ -65,6 +65,12 @@ function closeAgenda(noteObject) {
     });
 }
 
+function getAllMessages(uid) {
+    return MessageModel.find({
+        to: uid
+    })
+}
+
 function getNewMessages(uid) {
     return MessageModel.find({
         to: uid,
@@ -82,7 +88,7 @@ function getNewMessages(uid) {
         return Promise.all(promises);
     }).then(resolvedPromises => {
         const jsonMessages = [];
-        if (resolvedPromises.length  === 0) return Promise.resolve(jsonMessages);
+        if (resolvedPromises.length === 0) return Promise.resolve(jsonMessages);
         const messages = resolvedPromises[resolvedPromises.length - 1];
         for (const message of messages) jsonMessages.push(message.toJSON());
         return Promise.resolve(jsonMessages);
@@ -189,6 +195,7 @@ module.exports = {
     createNewAgenda,
     getAgenda,
     getAgendaOf,
+    getAllMessages,
     getNewMessages,
     openAgenda,
     resetAgenda,
