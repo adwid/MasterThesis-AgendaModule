@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
 const requestHandler = require('../handlers/requestHandler');
+const actorHandler = require('../handlers/actorHandler');
 
 const routes = {
     'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
@@ -24,8 +25,8 @@ router.post('/:route', (req, res, next) => {
         return;
     }
 
-    // todo extract author's address and forward to its secretary !
-
+    // Forward the activity to the secretary's inbox (of the agenda module)
+    // The secretary is in charge of processing and forwarding all messages
     axios.post(process.env.PREFIX + process.env.HOST + ':' + process.env.AGENDA_INBOX_PORT + '/agenda/secretary' + currentRoute.inboxDestination, activity)
         .then(_ => res.status(201).end())
         .catch(err => {
