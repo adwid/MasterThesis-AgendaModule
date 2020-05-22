@@ -125,21 +125,20 @@ function resetAgenda(noteObject) {
     });
 }
 
-function storeMessage(noteObject) {
+function storeMessage(activity) {
     const promises = [];
-    for (const recipient of noteObject.to) {
+    for (const recipient of activity.to) {
         const url = new URL(recipient);
         if (url.hostname === process.env.HOST) // only store for users of the current Agenda Module's domain
-            promises.push(storeMessageAux(noteObject, recipient))
+            promises.push(storeMessageAux(activity, recipient))
     }
     return Promise.all(promises)
 }
 
-function storeMessageAux(noteObject, to) {
+function storeMessageAux(activity, to) {
     const message = new MessageModel({
         to: to,
-        url: noteObject.content.url,
-        text: noteObject.content.type
+        url: activity.id
     });
     return message.save()
         .catch(err => console.error("[ERR]: not able to save message : " + err))
@@ -185,7 +184,7 @@ function documentToJSON(agenda) {
     var json = agenda.toJSON();
     delete json._id;
     delete json.__v;
-    json.adendaID = agenda.id;
+    json.agendaID = agenda.id;
     return json;
 }
 

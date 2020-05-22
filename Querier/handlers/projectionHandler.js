@@ -1,4 +1,5 @@
-function generateGetObjectQuery(id) {
+function generateGetObjectsQuery(ids) {
+    ids = toString(ids);
     return "options({\n" +
         "    $includeLinks: false,\n" +
         "    reorderEvents: false,\n" +
@@ -9,21 +10,28 @@ function generateGetObjectQuery(id) {
         ".when({\n" +
         "    $init:function(){\n" +
         "        return {\n" +
-        "            count: 0\n" +
+        "            list: []\n" +
         "        }\n" +
         "    },\n" +
         "    $any: function(state, event){\n" +
         "        if (event.data !== undefined) {\n" +
-        "            if (event.data.id === \"" + id + "\" \n" +
-        "            || (event.data.object !== undefined && event.data.object.id === \"" + id + "\")) {\n" +
-        "                state.count++;\n" +
-        "                state.activity = event.data;\n" +
+        // "            if (event.data.id === \"" + ids + "\" \n" +
+        "            if (" + ids + ".includes(event.data.id) \n" +
+        "            || (event.data.object !== undefined && " + ids + ".includes(event.data.object.id))) {\n" +
+        "                state.list.push(event.data);\n" +
         "            }\n" +
         "        }\n" +
         "    }\n" +
         "})";
 }
 
+function toString(array) {
+    var out = "[";
+    for(const item of array) out += "\"" + item + "\","
+    out += "]";
+    return out
+}
+
 module.exports = {
-    generateGetObjectQuery,
+    generateGetObjectsQuery,
 };

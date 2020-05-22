@@ -36,14 +36,14 @@ function onNewEvent(sub, event) {
     const activity = JSON.parse(event.originalEvent.data);
 
     if (eventType === "message") {
-        db.storeMessage(activity.object).then(_ => {
+        db.storeMessage(activity).then(_ => {
             console.log("Message received and available to the recipient(s) !");
         }).catch(err => console.error("[ERR] storeMessage err ; " + err));
         return;
     }
 
     if (!eventCallback.hasOwnProperty(eventType)) {
-        console.error("[ERR] ES : unkown event's type : " + eventType);
+        console.error("[ERR] ES : unknown event's type : " + eventType);
         return;
     }
 
@@ -80,8 +80,8 @@ function initProjection() {
         });
 }
 
-function getSpecificObject(id) {
-    const projection = projHandler.generateGetObjectQuery(id);
+function getSpecificObjects(ids) {
+    const projection = projHandler.generateGetObjectsQuery(ids);
     return runProjection(projection);
 }
 
@@ -105,5 +105,5 @@ function runProjection(projection) {
 }
 
 module.exports = {
-    getSpecificObject,
+    getSpecificObjects,
 };

@@ -46,10 +46,11 @@ router.get("/content/:id", (req, res) => {
 
 router.get("/:id", (req, res) => {
     var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-    esHandler.getSpecificObject(fullUrl)
-        .then(object => {
-            if (object.count === 0) res.status(204).end();
-            else if (object.count === 1) res.json(object.activity);
+    esHandler.getSpecificObjects([fullUrl])
+        .then(esResponse => {
+            const list = esResponse.list;
+            if (list.length === 0) res.status(204).end();
+            else if (list.length === 1) res.json(list[0]);
             else return Promise.reject("The projection counted more than one event for the ID : " + fullUrl);
         })
         .catch(err => {
