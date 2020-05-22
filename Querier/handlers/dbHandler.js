@@ -200,4 +200,5 @@ module.exports = {
     openAgenda,
     resetAgenda,
     storeMessage,
-    withdrawVote,};
+    withdrawVote,
+};

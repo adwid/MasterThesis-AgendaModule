@@ -24,48 +24,6 @@ function generateGetObjectQuery(id) {
         "})";
 }
 
-function generateGetActorActivitiesQuery(actor) {
-    return "options({\n" +
-        "    $includeLinks: false,\n" +
-        "    reorderEvents: false,\n" +
-        "    processingLag: 0\n" +
-        "})\n" +
-        "\n" +
-        "fromStream('agenda')\n" +
-        ".when({\n" +
-        "    $init:function(){\n" +
-        "        return {\n" +
-        "            list: []\n" +
-        "        }\n" +
-        "    },\n" +
-        "    $any: function(state, event){\n" +
-        "        if (event.data.actor === \"" + actor + "\") state.list.push(event.data)\n" +
-        "    }\n" +
-        "})";
-}
-
-function generateGetRecipientActivitiesQuery(recipient) {
-    return "options({\n" +
-        "    $includeLinks: false,\n" +
-        "    reorderEvents: false,\n" +
-        "    processingLag: 0\n" +
-        "})\n" +
-        "\n" +
-        "fromStream('agenda')\n" +
-        ".when({\n" +
-        "    $init:function(){\n" +
-        "        return {\n" +
-        "            list: []\n" +
-        "        }\n" +
-        "    },\n" +
-        "    $any: function(state, event){\n" +
-        "        if (event.data.to.includes(\"" + recipient + "\")) state.list.push(event.data)\n" +
-        "    }\n" +
-        "})";
-}
-
 module.exports = {
-    generateGetActorActivitiesQuery,
     generateGetObjectQuery,
-    generateGetRecipientActivitiesQuery,
 };

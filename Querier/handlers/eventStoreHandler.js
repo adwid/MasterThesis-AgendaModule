@@ -34,16 +34,19 @@ initProjection()
 function onNewEvent(sub, event) {
     const eventType = event.originalEvent.eventType;
     const activity = JSON.parse(event.originalEvent.data);
+
     if (eventType === "message") {
         db.storeMessage(activity.object).then(_ => {
             console.log("Message received and available to the recipient(s) !");
         }).catch(err => console.error("[ERR] storeMessage err ; " + err));
         return;
     }
+
     if (!eventCallback.hasOwnProperty(eventType)) {
         console.error("[ERR] ES : unkown event's type : " + eventType);
         return;
     }
+
     var updateDB = eventCallback[eventType].dbCallback;
     updateDB(activity.object) // Pass the note object of the activity and store it to DB
         .then(objectSaved => {
