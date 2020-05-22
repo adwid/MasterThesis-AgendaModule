@@ -6,7 +6,6 @@ const uuid = require('uuid/v1');
 function generateCreateAgendaActivity(request) {
     const activity = generateCreateObjectActivity(request, objectFields, isValidAgenda);
     if (!activity) return undefined;
-    // activity.object.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/updated/" + uuid();
     return activity;
 }
 

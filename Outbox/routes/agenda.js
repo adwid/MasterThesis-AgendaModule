@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios').default;
 const requestHandler = require('../handlers/requestHandler');
-const actorHandler = require('../handlers/actorHandler');
 
 const routes = {
     'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
