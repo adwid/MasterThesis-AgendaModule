@@ -3,12 +3,12 @@ const router = express.Router();
 const db = require("../handlers/dbHandler");
 const esHandler = require('../handlers/eventStoreHandler');
 
-router.get("/all/:uid", (req, res) => {
-    processRequest(db.getAllMessages, req.params.uid, res);
-});
-
 router.get("/new/:uid", (req, res) => {
     processRequest(db.getNewMessages, req.params.uid, res);
+});
+
+router.get("/old/:uid", (req, res) => {
+    processRequest(db.getOldMessages, req.params.uid, res);
 });
 
 function processRequest(dbFunction, uid, response) {

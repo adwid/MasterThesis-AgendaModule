@@ -65,12 +65,6 @@ function closeAgenda(noteObject) {
     });
 }
 
-function getAllMessages(uid) {
-    return MessageModel.find({
-        to: uid
-    })
-}
-
 function getNewMessages(uid) {
     return MessageModel.find({
         to: uid,
@@ -92,6 +86,13 @@ function getNewMessages(uid) {
         const messages = resolvedPromises[resolvedPromises.length - 1];
         for (const message of messages) jsonMessages.push(message.toJSON());
         return Promise.resolve(jsonMessages);
+    });
+}
+
+function getOldMessages(uid) {
+    return MessageModel.find({
+        to: uid,
+        seen: true
     });
 }
 
@@ -194,8 +195,8 @@ module.exports = {
     createNewAgenda,
     getAgenda,
     getAgendaWith,
-    getAllMessages,
     getNewMessages,
+    getOldMessages,
     openAgenda,
     resetAgenda,
     storeMessage,
