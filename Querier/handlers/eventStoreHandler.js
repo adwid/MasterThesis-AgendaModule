@@ -61,12 +61,12 @@ function initProjection() {
     const body = "options({})\n" +
         "\n" +
         "fromStream('doesNotExist" + Date.now() + "')";
-    // todo extract URL (in eventStore.js ?)
     return axios.post("http://eventstore:2113/projections/onetime?name="
         + projectionName + "&type=JS&enabled=true&checkpoints=false&emit=false&trackemittedstreams=false",
         body, {auth: esCredentials})
         .catch(err => {
             // If the projection already exists (409 -> conflict), it's ok
+            // Here, we just want to ensure the projection is initialized
             if (err.response !== undefined && err.response.status === 409) return Promise.resolve();
             isProjectionInitialized = false;
             return Promise.reject(err);
