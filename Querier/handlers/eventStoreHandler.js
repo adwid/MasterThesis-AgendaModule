@@ -75,8 +75,13 @@ function initProjection() {
             return Promise.reject(err);
         })
         .then(_ => {
+            // Wait until tje projection is executing
+            return axios.get("http://eventStore:2113/projection/" + projectionName + "/result", {auth: esCredentials});
+        })
+        .then(_ => {
             console.log("EventStore : projection initialized");
             isProjectionInitialized = true;
+            return Promise.resolve();
         });
 }
 
