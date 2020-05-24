@@ -15,7 +15,6 @@ function generateGetObjectsQuery(ids) {
         "    },\n" +
         "    $any: function(state, event){\n" +
         "        if (event.data !== undefined) {\n" +
-        // "            if (event.data.id === \"" + ids + "\" \n" +
         "            if (" + ids + ".includes(event.data.id) \n" +
         "            || (event.data.object !== undefined && " + ids + ".includes(event.data.object.id))) {\n" +
         "                state.list.push(event.data);\n" +
