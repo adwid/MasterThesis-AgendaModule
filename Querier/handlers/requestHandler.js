@@ -27,6 +27,7 @@ function objectToActivity(object, type) {
         "type": "Create",
         "to": to,
         "actor": secretary,
+        "published": (new Date()).toISOString(),
         "object": {
             "@context": "https://www.w3.org/ns/activitystreams",
             "id": process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid(),
