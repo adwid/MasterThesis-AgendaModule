@@ -31,7 +31,7 @@ function close() {
 }
 
 function noEventStoreConnection() {
-    console.error("An error occurred with the EventStore connection");
+    console.error("An error occurred with the EventStore connection (no connection)");
     process.exit(1);
 }
 

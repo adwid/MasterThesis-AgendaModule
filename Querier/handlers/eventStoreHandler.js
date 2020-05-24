@@ -61,19 +61,13 @@ function onNewEvent(sub, event) {
 }
 
 function initProjection() {
+    if (isProjectionInitialized) return Promise.then();
     const body = "options({})\n" +
         "\n" +
         "fromStream('doesNotExist" + Date.now() + "')";
     return axios.post("http://eventstore:2113/projections/onetime?name="
         + projectionName + "&type=JS&enabled=true&checkpoints=false&emit=false&trackemittedstreams=false",
         body, {auth: esCredentials})
-        .catch(err => {
-            // If the projection already exists (409 -> conflict), it's ok
-            // Here, we just want to ensure the projection is initialized
-            if (err.response !== undefined && err.response.status === 409) return Promise.resolve();
-            isProjectionInitialized = false;
-            return Promise.reject(err);
-        })
         .then(_ => {
             // Wait until tje projection is executing
             return axios.get("http://eventStore:2113/projection/" + projectionName + "/result", {auth: esCredentials});
@@ -82,7 +76,15 @@ function initProjection() {
             console.log("EventStore : projection initialized");
             isProjectionInitialized = true;
             return Promise.resolve();
-        });
+        })
+        .catch(err => {
+            // If the projection already exists (409 -> conflict), it's ok
+            // Here, we just want to ensure the projection is initialized
+            if (err.response !== undefined && err.response.status === 409) return Promise.resolve();
+            console.error("[ERR] ES projection init : " + err);
+            console.error("[ERR] ES projection init : retrying...");
+            return setTimeout(initProjection, 1000);
+        })
 }
 
 function getSpecificObjects(ids) {
