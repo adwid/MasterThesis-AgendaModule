@@ -2,7 +2,8 @@ const AgendaModel = require('../models/agenda');
 const MessageModel = require('../models/message');
 const { v1: uuid } = require('uuid');
 
-function createNewAgenda(noteObject) {
+function createNewAgenda(activity) {
+    const noteObject = activity.object;
     const agenda = noteObject.content;
     const newAgendaContent = {
         _id: process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/content/" + uuid(),
@@ -12,7 +13,7 @@ function createNewAgenda(noteObject) {
         participants: []
     };
     newAgendaContent.participants.push({id: noteObject.attributedTo});
-    for (const participant of noteObject.to) {
+    for (const participant of agenda.with) {
         newAgendaContent.participants.push({id: participant});
     }
     for (const d of agenda.dates) {
@@ -22,7 +23,8 @@ function createNewAgenda(noteObject) {
     return newAgenda.save();
 }
 
-function applyVote(noteobject) {
+function applyVote(activity) {
+    const noteobject = activity.object;
     const agendaID = noteobject.content.agendaID;
     const userID = noteobject.attributedTo;
     const dates = noteobject.content.dates;
@@ -47,7 +49,8 @@ function applyVote(noteobject) {
         });
 }
 
-function closeAgenda(noteObject) {
+function closeAgenda(activity) {
+    const noteObject = activity.object;
     const agendaID = noteObject.content.agendaID;
     const selectedDate = noteObject.content.date;
     const userID = noteObject.attributedTo;
@@ -96,7 +99,8 @@ function getOldMessages(uid) {
     });
 }
 
-function openAgenda(noteObject) {
+function openAgenda(activity) {
+    const noteObject = activity.object;
     const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
@@ -109,7 +113,8 @@ function openAgenda(noteObject) {
     });
 }
 
-function resetAgenda(noteObject) {
+function resetAgenda(activity) {
+    const noteObject = activity.object;
     const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
@@ -128,24 +133,29 @@ function resetAgenda(noteObject) {
 
 function storeMessage(activity) {
     const promises = [];
-    for (const recipient of activity.to) {
-        const url = new URL(recipient);
-        if (url.hostname === process.env.HOST) // only store for users of the current Agenda Module's domain
-            promises.push(storeMessageAux(activity, recipient))
+    const to = Array.isArray(activity.to) ? activity.to : [activity.to];
+    for (const actor of to) {
+        let url = new URL(actor);
+        // only store message for users in the same domain than the current instance :
+        if (url.hostname === process.env.HOST)
+            promises.push(storeMessageAux(activity, actor));
     }
-    return Promise.all(promises)
+    return Promise.all(promises);
 }
 
-function storeMessageAux(activity, to) {
-    const message = new MessageModel({
-        to: to,
-        url: activity.id
+function storeMessageAux(activity, recipient) {
+    const newMessage = new MessageModel({
+        url: activity.id,
+        to: recipient
     });
-    return message.save()
-        .catch(err => console.error("[ERR]: not able to save message : " + err))
+    return newMessage.save()
+        .catch(err => {
+            console.error("[ERR] not able to store a message in DB : " + err);
+        });
 }
 
-function withdrawVote(noteObject) {
+function withdrawVote(activity) {
+    const noteObject = activity.object;
     const agendaID = noteObject.content.agendaID;
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
