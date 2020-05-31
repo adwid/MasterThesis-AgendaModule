@@ -21,10 +21,12 @@ router.get("/with/:id", (req, res) => {
 router.get("/secretary", (req, res) => {
     res.json({
         "@context": "http://www.w3.org/ns/activitystreams",
+        "id": process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/secretary",
         "type": "Application",
         "name": "Agenda module secretariat",
         "summary": "In charge of processing all messages concerning the agenda module (domain " +
-            process.env.PREFIX + process.env.HOST + ")"
+            process.env.PREFIX + process.env.HOST + ")",
+        "inbox": process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_INBOX_PORT + "/agenda/secretary",
     })
 });
 
