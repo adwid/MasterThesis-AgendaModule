@@ -19,8 +19,6 @@ router.post("/secretary/:route", (req, res, next) => {
     }
     let eventType = req.params.route;
     let activity = req.body;
-    activity.object.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
-    activity.id = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/" + uuid();
     postEvent(activity, eventType, res);
 });
 
