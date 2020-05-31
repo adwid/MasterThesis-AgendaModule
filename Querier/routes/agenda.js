@@ -49,7 +49,7 @@ router.get("/:id", (req, res) => {
     esHandler.getSpecificObjects([fullUrl])
         .then(esResponse => {
             const list = esResponse.list;
-            if (list.length === 0) res.status(204).end();
+            if (!list || list.length === 0) res.status(204).end();
             else if (list.length === 1) res.json(list[0]);
             else return Promise.reject("The projection counted more than one event for the ID : " + fullUrl);
         })
