@@ -66,6 +66,8 @@ function isValidAgenda(content) {
     if (!content
         || !agendaFields.every(field => content.hasOwnProperty(field))
         || !isDatesArray(content.dates, false)
+        || !Array.isArray(content.with)
+        || content.with.length < 2
     ) return false;
     return true;
 }
