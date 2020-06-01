@@ -41,6 +41,7 @@ router.post('/:route', (req, res, next) => {
         })
         .then(_ => res.status(201).json(activity))
         .catch(err => {
+            if (err.code === 'ECONNREFUSED') return res.status(502).end();
             console.error("Error(s) while forwarding to secretary : " + err);
             res.status(500).json({error: "An internal occurred. Please try later or contact admins."})
         });
