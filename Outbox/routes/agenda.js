@@ -4,6 +4,7 @@ const axios = require('axios').default;
 const requestHandler = require('../handlers/requestHandler');
 const db = require("../handlers/dbHandler");
 const { v1: uuid } = require('uuid');
+const actorHandler = require('../handlers/actorHandler');
 
 const routes = {
     'close': {inboxDestination: '/close', activityGenerator: requestHandler.generateCreateCloseActivity},
@@ -33,8 +34,10 @@ router.post('/:route', (req, res, next) => {
     // The secretary is in charge of processing and forwarding all messages
     db.storeActivity(activity)
         .then(_ => {
-            // todo get the actor domain ? check if it the same ?
-            return axios.post(process.env.PREFIX + process.env.HOST + ':' + process.env.AGENDA_INBOX_PORT + '/agenda/secretary' + currentRoute.inboxDestination, activity)
+            return actorHandler.getInboxAddresses(activity.to)
+        })
+        .then(addrs => {
+            return axios.post(addrs[0] + '/agenda/secretary' + currentRoute.inboxDestination, activity)
         })
         .then(_ => res.status(201).json(activity))
         .catch(err => {

@@ -6,7 +6,10 @@ function getInboxAddresses(userIDs) {
 
     for (const id of userIDs) promises.push(
         axios.get(id)
-            .then(actor => {return convertAddress(actor.data.data.inbox)})
+            .then(actor => {
+                if (actor.data.hasOwnProperty("data")) return convertAddress(actor.data.data.inbox)
+                return convertAddress(actor.data.inbox)
+            })
             .catch(_ => {}) // ignore the incorrect actors
     );
 
