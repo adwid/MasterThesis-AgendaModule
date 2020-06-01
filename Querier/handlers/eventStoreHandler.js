@@ -6,12 +6,12 @@ const streamId = "agenda";
 const esConnection = esClient.connection();
 
 const eventCallback = {
-    'create':   {dbCallback: db.createNewAgenda,    fwCallback: fw.forwardToOrganizer},
-    'vote':     {dbCallback: db.applyVote,          fwCallback: undefined},
-    'withdraw': {dbCallback: db.withdrawVote,       fwCallback: undefined},
-    'close':    {dbCallback: db.closeAgenda,        fwCallback: undefined},
-    'open':     {dbCallback: db.openAgenda,         fwCallback: undefined},
-    'reset':    {dbCallback: db.resetAgenda,        fwCallback: undefined},
+    'create':   {dbCallback: db.createNewAgenda,    fwCallback: fw.forwardOrganizerDecision},
+    'vote':     {dbCallback: db.applyVote,          fwCallback: fw.forwardParticipantDecision},
+    'withdraw': {dbCallback: db.withdrawVote,       fwCallback: fw.forwardParticipantDecision},
+    'close':    {dbCallback: db.closeAgenda,        fwCallback: fw.forwardOrganizerDecision},
+    'open':     {dbCallback: db.openAgenda,         fwCallback: fw.forwardOrganizerDecision},
+    'reset':    {dbCallback: db.resetAgenda,        fwCallback: fw.forwardOrganizerDecision},
     'news':     {dbCallback: db.storeNews,          fwCallback: undefined},
 };
 

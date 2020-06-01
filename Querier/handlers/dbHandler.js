@@ -29,7 +29,8 @@ function applyVote(activity) {
     const agendaID = noteobject.content.agendaID;
     const userID = noteobject.attributedTo;
     const dates = noteobject.content.dates;
-    return withdrawVote(noteobject)
+
+    return withdrawVote(activity)
         .then(() => {
             return AgendaModel.findOneAndUpdate({
                 _id: {$eq: agendaID},
@@ -57,15 +58,19 @@ function closeAgenda(activity) {
     const userID = noteObject.attributedTo;
     const findRequest = {
         _id: {$eq: agendaID},
-        "participants.0.id": userID
+        "participants.0.id": userID,
+        dates: {$elemMatch: {date: {$eq: selectedDate}}},
     };
-    if (selectedDate !== "") {
-        findRequest.dates = {$elemMatch: {date: {$eq: selectedDate}}};
-    }
     return AgendaModel.findOneAndUpdate(findRequest, {
         $set: {selectedDate: selectedDate}
-    }, {
-        new: true
+    }).then(agenda => {
+        if (!agenda) return Promise.reject({
+            name: "MyNotFoundError",
+            message: "You do not have the permission, " +
+                "tha agenda does not exist, " +
+                "or the chosen date does not exist."
+        });
+        return Promise.resolve(agenda);
     });
 }
 
@@ -118,8 +123,14 @@ function openAgenda(activity) {
         "participants.0.id": userID
     }, {
         $unset: {selectedDate: ""}
-    }, {
-        new: true
+    }).then(agenda => {
+        if (!agenda) return Promise.reject({
+            name: "MyNotFoundError",
+            message: "You do not have the permission, " +
+                "or tha agenda does not exist.",
+        });
+        return Promise.resolve(agenda);
+
     });
 }
 
@@ -136,8 +147,15 @@ function resetAgenda(activity) {
             "participants.$[].hasParticipated": false
         },
         $unset: {selectedDate: ""}
-    }, {
-        new: true
+    }).then(agenda => {
+        if (!agenda) return Promise.reject({
+            name: "MyNotFoundError",
+            message: "You do not have the permission, " +
+                "tha agenda does not exist, " +
+                "or the chosen date does not exist."
+        });
+        return Promise.resolve(agenda);
+
     });
 }
 

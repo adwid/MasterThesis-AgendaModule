@@ -13,12 +13,17 @@ function forwardErrorMessage(actor, rideID, type, message) {
     });
 }
 
-function forwardAgendaCreation(type, from, dbObject) {
+function forwardOrganizerDecision(type, from, dbObject) {
     const participants = dbObject.participants.map(participant => participant.id);
-    return Promise.all([
-        send(participants[0], {"url": dbObject._id, "from":from, "type": "create"}),
-        sendMany(participants.slice(1), {"url": dbObject._id, "from":from, "type": "created"}),
-    ])
+    return sendMany(participants, {"url": dbObject._id, "from": from, "type": type});
+}
+
+function forwardParticipantDecision(type, from, dbObject) {
+    const promises = [];
+    const organizer = dbObject.participants[0].id;
+    promises.push(send(from, {"url": dbObject._id, "from": from, "type": type}));
+    if (from !== organizer) promises.push(send(organizer, {"url": dbObject._id, "from": from, "type": type}));
+    return Promise.all(promises)
 }
 
 function send(actor, content) {
@@ -67,5 +72,6 @@ function objectToActivity(to, content) {
 
 module.exports = {
     forwardErrorMessage,
-    forwardToOrganizer: forwardAgendaCreation,
+    forwardOrganizerDecision,
+    forwardParticipantDecision,
 };
