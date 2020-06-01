@@ -14,6 +14,10 @@ const DateSchema = new mongoose.Schema({
     _id: false
 });
 
+function minTwoItems(array) {
+    return array.length > 1;
+}
+
 const AgendaSchema = new mongoose.Schema({
     _id: String,
     name: {type: String, required: true},
@@ -21,11 +25,13 @@ const AgendaSchema = new mongoose.Schema({
     selectedDate: Date,
     dates: {
         type: [DateSchema],
-        default: []
+        required: true,
+        validate: [minTwoItems, 'Field \'{PATH}\' needs at least 2 elements.'],
     },
     participants: {
         type: [ParticipantSchema],
-        required: true
+        required: true,
+        validate: [minTwoItems, 'Field \'{PATH}\' needs at least 2 elements.'],
     }
 });
 
