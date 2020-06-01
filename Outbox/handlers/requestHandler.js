@@ -1,6 +1,6 @@
 const createActivityFields = ["@context", "type", "actor", "object", "to"];
 const objectFields = ["@context", "type", "to", "attributedTo", "content", "mediaType"];
-const agendaFields = ["name", "description", "dates"];
+const agendaFields = ["name", "description", "dates", "with"];
 const uuid = require('uuid/v1');
 
 function generateCreateAgendaActivity(request) {
