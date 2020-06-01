@@ -34,7 +34,8 @@ function applyVote(activity) {
         .then(() => {
             return AgendaModel.findOneAndUpdate({
                 _id: {$eq: agendaID},
-                selectedDate: {$exists: false}
+                selectedDate: {$exists: false},
+                participants: {$elemMatch: {id: {$eq: userID}}},
             }, {
                 $addToSet: {
                     "dates.$[element].forIt": userID,
@@ -67,7 +68,7 @@ function closeAgenda(activity) {
         if (!agenda) return Promise.reject({
             name: "MyNotFoundError",
             message: "You do not have the permission, " +
-                "tha agenda does not exist, " +
+                "the agenda does not exist, " +
                 "or the chosen date does not exist."
         });
         return Promise.resolve(agenda);
@@ -127,7 +128,7 @@ function openAgenda(activity) {
         if (!agenda) return Promise.reject({
             name: "MyNotFoundError",
             message: "You do not have the permission, " +
-                "or tha agenda does not exist.",
+                "or the agenda does not exist.",
         });
         return Promise.resolve(agenda);
 
@@ -151,11 +152,10 @@ function resetAgenda(activity) {
         if (!agenda) return Promise.reject({
             name: "MyNotFoundError",
             message: "You do not have the permission, " +
-                "tha agenda does not exist, " +
+                "the agenda does not exist, " +
                 "or the chosen date does not exist."
         });
         return Promise.resolve(agenda);
-
     });
 }
 
@@ -194,7 +194,8 @@ function withdrawVote(activity) {
     const userID = noteObject.attributedTo;
     return AgendaModel.findOneAndUpdate({
         _id: {$eq: agendaID},
-        selectedDate: {$exists: false}
+        selectedDate: {$exists: false},
+        participants: {$elemMatch: {id: {$eq: userID}}},
     }, {
         $pull: {
             "dates.$[].forIt": userID,
@@ -203,9 +204,18 @@ function withdrawVote(activity) {
             "participants.$[participant].hasParticipated": false
         }
     }, {
-        arrayFilters : [
-            { "participant.id": { $eq : userID } }
+        arrayFilters: [
+            {"participant.id": {$eq: userID}}
         ]
+    }).then(agenda => {
+        if (!agenda) return Promise.reject({
+            name: "MyNotFoundError",
+            message: "The agenda does not exist, " +
+                "you are not part of the participants, " +
+                "or the agenda is closed."
+        });
+        return Promise.resolve(agenda);
+
     });
 }
 

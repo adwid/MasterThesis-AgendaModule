@@ -46,19 +46,19 @@ function onNewEvent(sub, event) {
 
 function catcher(err, activity, eventType) {
     if (err.name === "ValidationError") {
-        const rideID = activity.object.content.rideID;
+        const agendaID = activity.object.content.agendaID;
         const errField = Object.keys(err.errors)[0];
-        fw.forwardErrorMessage(activity.actor, rideID, eventType, err.errors[errField].message);
+        fw.forwardErrorMessage(activity.actor, agendaID, eventType, err.errors[errField].message);
         return;
     }
     if (err.name === "MongoError" && err.code === 11000) {
-        const rideID = activity.object.content.rideID;
-        fw.forwardErrorMessage(activity.actor, rideID, eventType, "Duplication:" + Object.keys(err.keyValue));
+        const agendaID = activity.object.content.agendaID;
+        fw.forwardErrorMessage(activity.actor, agendaID, eventType, "Duplication:" + Object.keys(err.keyValue));
         return;
     }
     if (err.name === "MyNotFoundError") {
-        const rideID = activity.object.content.rideID;
-        fw.forwardErrorMessage(activity.actor, rideID, eventType, err.message);
+        const agendaID = activity.object.content.agendaID;
+        fw.forwardErrorMessage(activity.actor, agendaID, eventType, err.message);
         return;
     }
     console.log("[ERR] ES/onNewEvent : " + err);
