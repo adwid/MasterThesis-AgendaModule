@@ -1,4 +1,5 @@
 const AgendaModel = require('../models/agenda');
+const MessageModel = require('../models/message');
 const NewsModel = require('../models/news');
 const { v1: uuid } = require('uuid');
 
@@ -68,6 +69,15 @@ function closeAgenda(activity) {
     });
 }
 
+function getActivity(id) {
+    return MessageModel.findOne({
+        $or: [
+            {id: id},
+            {"object.id": id}
+        ]
+    }, "-_id -__v")
+}
+
 function getNewNews(uid) {
     return NewsModel.find({
         to: uid,
@@ -131,6 +141,12 @@ function resetAgenda(activity) {
     });
 }
 
+function storeActivity(activity) {
+    const message = new MessageModel(activity);
+    message._id = activity.id
+    return message.save();
+}
+
 function storeNews(activity) {
     const promises = [];
     const to = Array.isArray(activity.to) ? activity.to : [activity.to];
@@ -145,7 +161,7 @@ function storeNews(activity) {
 
 function storeNewsAux(activity, recipient) {
     const newNews = new NewsModel({
-        url: activity.id,
+        message: activity.id,
         to: recipient
     });
     return newNews.save()
@@ -203,12 +219,14 @@ module.exports = {
     applyVote,
     closeAgenda,
     createNewAgenda,
+    getActivity,
     getAgenda,
     getAgendaWith,
     getNewNews,
     getOldNews,
     openAgenda,
     resetAgenda,
+    storeActivity,
     storeNews,
     withdrawVote,
 };

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const NewsSchema = new mongoose.Schema({
     date: {type: Date, default: Date.now, required: true},
-    url: {type: String, required: true},
+    message: {type: String, required: true},
     to: {type: String, required: true},
     seen: {type: Boolean, required: true, default: false},
 });

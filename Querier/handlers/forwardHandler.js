@@ -1,6 +1,7 @@
 const { v1: uuid } = require('uuid');
 const axios = require('axios');
 const actorHandler = require('./actorHandler');
+const db = require('./dbHandler');
 
 function forwardErrorMessage(actor, rideID, type, message) {
     send(actor, {
@@ -21,15 +22,17 @@ function forwardAgendaCreation(type, from, dbObject) {
 }
 
 function send(actor, content) {
-    console.log(actor);
     const activity = objectToActivity(actor, content);
     return actorHandler.getInboxAddresses(actor)
         .then(addr => {
             if (addr.length === 0) return Promise.reject("(send) no inbox addr found.");
-            return axios.post(addr[0], activity)
+            return db.storeActivity(activity).then(_ => { return addr[0] });
+        })
+        .then(addr => {
+            return axios.post(addr, activity)
         })
         .catch(err => {
-            console.error("[ERR] unable to send message (" + addr +") ; " + err )
+            console.error("[ERR] unable to send message (" + actor + ") : " + err)
             return Promise.resolve();
         });
 }
@@ -42,17 +45,17 @@ function sendMany(actors, content) {
 }
 
 function objectToActivity(to, content) {
-    const secretary = process.env.PREFIX + process.env.HOST + ":" + process.env.CARPOOLING_QUERIER_PORT + '/carpooling/secretary';
+    const secretary = process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + '/agenda/secretary';
     return {
         "@context": "https://www.w3.org/ns/activitystreams",
-        "id": process.env.PREFIX + process.env.HOST + ":" + process.env.CARPOOLING_QUERIER_PORT + "/carpooling/" + uuid(),
+        "id": process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/message/" + uuid(),
         "type": "Create",
         "to": to,
         "actor": secretary,
         "published": (new Date()).toISOString(),
         "object": {
             "@context": "https://www.w3.org/ns/activitystreams",
-            "id": process.env.PREFIX + process.env.HOST + ":" + process.env.CARPOOLING_QUERIER_PORT + "/carpooling/" + uuid(),
+            "id": process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/message/" + uuid(),
             "type": "Note",
             "mediaType": "application/json",
             "attributedTo": secretary,
