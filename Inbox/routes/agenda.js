@@ -22,9 +22,9 @@ router.post("/secretary/:route", (req, res, next) => {
     postEvent(activity, eventType, res);
 });
 
-router.post("/message", (req, res) => {
+router.post("/news", (req, res) => {
     let activity = req.body;
-    postEvent(activity, "message", res);
+    postEvent(activity, "news", res);
 });
 
 function postEvent(activity, eventType, res) {

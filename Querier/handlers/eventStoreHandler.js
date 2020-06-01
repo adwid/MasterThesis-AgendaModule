@@ -18,7 +18,7 @@ const eventCallback = {
     'close':    {dbCallback: db.closeAgenda,        fwCallback: undefined},
     'open':     {dbCallback: db.openAgenda,         fwCallback: undefined},
     'reset':    {dbCallback: db.resetAgenda,        fwCallback: undefined},
-    'message':  {dbCallback: db.storeMessage,       fwCallback: undefined},
+    'news':     {dbCallback: db.storeNews,          fwCallback: undefined},
 };
 
 esConnection.subscribeToStream(streamId, false, onNewEvent)

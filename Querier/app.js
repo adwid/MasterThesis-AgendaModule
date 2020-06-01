@@ -10,8 +10,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use("/agenda/news", require('./routes/news'));
 app.use("/agenda", require('./routes/agenda'));
-app.use("/message", require('./routes/message'));
 
 database.open()
     .catch(() => {

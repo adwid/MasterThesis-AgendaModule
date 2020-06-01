@@ -1,5 +1,5 @@
 const AgendaModel = require('../models/agenda');
-const MessageModel = require('../models/message');
+const NewsModel = require('../models/news');
 const { v1: uuid } = require('uuid');
 
 function createNewAgenda(activity) {
@@ -68,32 +68,32 @@ function closeAgenda(activity) {
     });
 }
 
-function getNewMessages(uid) {
-    return MessageModel.find({
+function getNewNews(uid) {
+    return NewsModel.find({
         to: uid,
         seen: false
-    }).then(messages => {
+    }).then(news => {
         const promises = [];
-        for (const message of messages) {
-            promises.push(message.update({
+        for (const newsItem of news) {
+            promises.push(newsItem.update({
                 $set: {seen: true}
             }).catch(err => {
                 console.error("[ERR] db update : " + err)
             }));
         }
-        promises.push(Promise.resolve(messages)); // keep messages for next step
+        promises.push(Promise.resolve(news)); // keep news for next step
         return Promise.all(promises);
     }).then(resolvedPromises => {
-        const jsonMessages = [];
-        if (resolvedPromises.length === 0) return Promise.resolve(jsonMessages);
-        const messages = resolvedPromises[resolvedPromises.length - 1];
-        for (const message of messages) jsonMessages.push(message.toJSON());
-        return Promise.resolve(jsonMessages);
+        const jsonNews = [];
+        if (resolvedPromises.length === 0) return Promise.resolve(jsonNews);
+        const news = resolvedPromises[resolvedPromises.length - 1];
+        for (const newsItem of news) jsonNews.push(newsItem.toJSON());
+        return Promise.resolve(jsonNews);
     });
 }
 
-function getOldMessages(uid) {
-    return MessageModel.find({
+function getOldNews(uid) {
+    return NewsModel.find({
         to: uid,
         seen: true
     });
@@ -131,26 +131,26 @@ function resetAgenda(activity) {
     });
 }
 
-function storeMessage(activity) {
+function storeNews(activity) {
     const promises = [];
     const to = Array.isArray(activity.to) ? activity.to : [activity.to];
     for (const actor of to) {
         let url = new URL(actor);
-        // only store message for users in the same domain than the current instance :
+        // only store news for users in the same domain than the current instance :
         if (url.hostname === process.env.HOST)
-            promises.push(storeMessageAux(activity, actor));
+            promises.push(storeNewsAux(activity, actor));
     }
     return Promise.all(promises);
 }
 
-function storeMessageAux(activity, recipient) {
-    const newMessage = new MessageModel({
+function storeNewsAux(activity, recipient) {
+    const newNews = new NewsModel({
         url: activity.id,
         to: recipient
     });
-    return newMessage.save()
+    return newNews.save()
         .catch(err => {
-            console.error("[ERR] not able to store a message in DB : " + err);
+            console.error("[ERR] not able to store a news in DB : " + err);
         });
 }
 
@@ -205,10 +205,10 @@ module.exports = {
     createNewAgenda,
     getAgenda,
     getAgendaWith,
-    getNewMessages,
-    getOldMessages,
+    getNewNews,
+    getOldNews,
     openAgenda,
     resetAgenda,
-    storeMessage,
+    storeNews,
     withdrawVote,
 };
