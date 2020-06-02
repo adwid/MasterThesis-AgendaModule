@@ -6,6 +6,12 @@ const { v1: uuid } = require('uuid');
 function createNewAgenda(activity) {
     const noteObject = activity.object;
     const agenda = noteObject.content;
+    let actorURL = new URL(noteObject.attributedTo);
+    if (actorURL.hostname !== process.env.HOST)
+        return Promise.reject({
+            name: "MyNotFoundError",
+            message: "We have different domain. Please contact your secretary."
+        })
     const newAgendaContent = {
         _id: process.env.PREFIX + process.env.HOST + ":" + process.env.AGENDA_QUERIER_PORT + "/agenda/content/" + uuid(),
         name: agenda.name,
