@@ -11,7 +11,6 @@ function generateCreateAgendaActivity(request) {
 
 function generateCreateVoteActivity(request) {
     const specificObjectFields = objectFields.slice();
-    specificObjectFields.push("inReplyTo");
     return generateCreateObjectActivity(request, specificObjectFields, isValidVote);
 }
 
@@ -24,7 +23,6 @@ function generateCreateAgendaIDActivity(request) {
 
 function generateCreateCloseActivity(request) {
     const specificObjectFields = objectFields.slice();
-    specificObjectFields.push("inReplyTo");
     return generateCreateObjectActivity(request, specificObjectFields, isValidClose);
 }
 
