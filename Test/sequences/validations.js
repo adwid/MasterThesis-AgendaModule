@@ -33,6 +33,7 @@ describe("[Agenda] Validations", function () {
             });
     })
 
+    this.slow(common.slow)
     beforeEach(done => setTimeout(done, common.timeout));
 
     describe("Agenda validation - each field", function () {

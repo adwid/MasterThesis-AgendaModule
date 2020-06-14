@@ -11,6 +11,7 @@ const agendaSecretary = process.env.PREFIX + process.env.HOST + ":" + process.en
 const actorsIDs = [];
 const buffer = [];
 const timeout = 100 ;
+const slow = 1000;
 
 
 module.exports = {
@@ -20,5 +21,6 @@ module.exports = {
     agendaSecretary,
     buffer,
     chai,
+    slow,
     timeout,
 }

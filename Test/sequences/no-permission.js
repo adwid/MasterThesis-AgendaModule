@@ -31,6 +31,7 @@ describe("[Agenda] Some interactions refused", function () {
             });
     })
 
+    this.slow(common.slow)
     beforeEach(done => setTimeout(done, common.timeout));
 
     describe("actor[0] creates an agenda", function () {
